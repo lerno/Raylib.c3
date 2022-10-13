@@ -1,7 +1,9 @@
 <a href="http://www.c3-lang.org/"><img style="vertical-align:middle" src=https://i.imgur.com/jtVwIgz.png></a>
-# Raylib C3 - Using Raylib Version 4.5-dev
+# Raylib C3
 
 [C3](http://www.c3-lang.org/) binding for [Raylib](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
+
+*Using Raylib Version 4.5-dev*
 
 ## Supported Platforms
 - Windows
