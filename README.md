@@ -84,3 +84,6 @@ This is the first binding I've made and made available to the public.
 I am aware that not everyone adheres to the same coding conventions and that this may not be to everyone's liking, but please feel free to submit your PRs so that we may make different branches to suit everyone!
 
 Due to my lack of confidence in my abilities, I would also like to mention that there *might* be some code that does not function properly, not that I believe there is. Nevertheless, I hope you can help me improve by pointing out any potential mistakes I may have made. 
+
+## Credits
+Massive thank you to Christoffer L (C3 Creator) for his help on [C3 Discord community server](https://discord.gg/UWUTtUGJBT) and his vendor library template that Raylib-C3 grew from.
