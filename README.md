@@ -39,7 +39,6 @@ https://github.com/Its-Kenta/Raylib-C3.git
 **5.** Add the example code to your main.c3 in *src/YOURPROJECTNAME/main.c3*
 ```c
 import rl;
-import std::io;
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 450;
