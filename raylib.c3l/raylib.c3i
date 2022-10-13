@@ -1,0 +1,1890 @@
+module rl;
+ 
+const float PI = 3.14159265358979323846f;
+const float DEG2RAD = PI / 180.0f;
+const float RAD2DEG = 180.0f / PI;
+
+// NOTE: We set some defines with some data types declared by raylib
+// Other modules (raymath, rlgl) also require some of those types, so,
+// to be able to use those other modules as standalone (not depending on raylib)
+// this defines are very useful for internal check and avoid type (re)definitions
+
+// Some Basic Colors
+// NOTE: Custom raylib color palette for amazing visuals on WHITE background
+const Color LIGHTGRAY = { 200, 200, 200, 255 };   // Light Gray
+const Color GRAY = { 130, 130, 130, 255 };   // Gray
+const Color DARKGRAY = { 80, 80, 80, 255 };      // Dark Gray
+const Color YELLOW = { 253, 249, 0, 255 };     // Yellow
+const Color GOLD = { 255, 203, 0, 255 };     // Gold
+const Color ORANGE = { 255, 161, 0, 255 };     // Orange
+const Color PINK = { 255, 109, 194, 255 };   // Pink
+const Color RED = { 230, 41, 55, 255 };     // Red
+const Color MAROON = { 190, 33, 55, 255 };     // Maroon
+const Color GREEN = { 0, 228, 48, 255 };      // Green
+const Color LIME = { 0, 158, 47, 255 };      // Lime
+const Color DARKGREEN = { 0, 117, 44, 255 };      // Dark Green
+const Color SKYBLUE = { 102, 191, 255, 255 };   // Sky Blue
+const Color BLUE = { 0, 121, 241, 255 };     // Blue
+const Color DARKBLUE = { 0, 82, 172, 255 };      // Dark Blue
+const Color PURPLE = { 200, 122, 255, 255 };   // Purple
+const Color VIOLET = { 135, 60, 190, 255 };    // Violet
+const Color DARKPURPLE = { 112, 31, 126, 255 };    // Dark Purple
+const Color BEIGE = { 211, 176, 131, 255 };   // Beige
+const Color BROWN = { 127, 106, 79, 255 };    // Brown
+const Color DARKBROWN = { 76, 63, 47, 255 };      // Dark Brown
+
+const Color WHITE = { 255, 255, 255, 255 };   // White
+const Color BLACK = { 0, 0, 0, 255 };         // Black
+const Color BLANK = { 0, 0, 0, 0 };           // Blank (Transparent)
+const Color MAGENTA = { 255, 0, 255, 255 };     // Magenta
+const Color RAYWHITE = { 245, 245, 245, 255 };   // My own White (raylib logo)
+
+// Vector2, 2 components
+struct Vector2 
+{
+    float x;                // Vector x component
+    float y;                // Vector y component
+}
+
+// Vector3, 3 components
+struct Vector3 
+{
+    float x;                // Vector x component
+    float y;                // Vector y component
+    float z;                // Vector z component
+}
+
+// Vector4, 4 components
+struct Vector4 {
+    float x;                // Vector x component
+    float y;                // Vector y component
+    float z;                // Vector z component
+    float w;                // Vector w component
+}
+
+struct FilePathList {
+    uint capacity;          // Filepaths max entries
+    uint count;             // Filepaths entries count
+    char** paths;                   // Filepaths entries
+}
+
+// Quaternion, 4 components (Vector4 alias)
+define Quaternion = Vector4; 
+
+// Matrix, 4x4 components, column major, OpenGL style, right handed
+struct Matrix 
+{
+    float m0, m4, m8, m12;  // Matrix first row (4 components)
+    float m1, m5, m9, m13;  // Matrix second row (4 components)
+    float m2, m6, m10, m14; // Matrix third row (4 components)
+    float m3, m7, m11, m15; // Matrix fourth row (4 components)
+}
+
+// Color, 4 components, R8G8B8A8 (32bit)
+struct Color 
+{
+    char r;        // Color red value
+    char g;        // Color green value
+    char b;        // Color blue value
+    char a;        // Color alpha value
+}
+
+// Rectangle, 4 components
+struct Rectangle 
+{
+    float x;                // Rectangle top-left corner position x
+    float y;                // Rectangle top-left corner position y
+    float width;            // Rectangle width
+    float height;           // Rectangle height
+}
+
+// Image, pixel data stored in CPU memory (RAM)
+struct Image 
+{
+    void* data;             // Image raw data
+    int width;              // Image base width
+    int height;             // Image base height
+    int mipmaps;            // Mipmap levels, 1 by default
+    PixelFormat format;     // Data format (PixelFormat type)
+}
+
+// Texture, tex data stored in GPU memory (VRAM)
+struct Texture 
+{
+    uint id;                // OpenGL texture id
+    int width;              // Texture base width
+    int height;             // Texture base height
+    int mipmaps;            // Mipmap levels, 1 by default
+    PixelFormat format;     // Data format (PixelFormat type)
+}
+
+// Texture2D, same as Texture
+define Texture2D = Texture;
+
+// TextureCubemap, same as Texture
+define TextureCubemap = Texture;
+
+// RenderTexture, fbo for texture rendering
+struct RenderTexture 
+{
+    uint id;                // OpenGL framebuffer object id
+    Texture texture;        // Color buffer attachment texture
+    Texture depth;          // Depth buffer attachment texture
+}
+
+// RenderTexture2D, same as RenderTexture
+define RenderTexture2D = RenderTexture;
+
+// NPatchInfo, n-patch layout info
+struct NPatchInfo
+{
+    Rectangle source;       // Texture source rectangle
+    int left;               // Left border offset
+    int top;                // Top border offset
+    int right;              // Right border offset
+    int bottom;             // Bottom border offset
+    NPatchLayout layout;    // Layout of the n-patch: 3x3, 1x3 or 3x1
+}
+
+// GlyphInfo, font characters glyphs info
+struct GlyphInfo 
+{
+    int value;              // Character value (Unicode)
+    int offsetX;            // Character offset X when drawing
+    int offsetY;            // Character offset Y when drawing
+    int advanceX;           // Character advance position X
+    Image image;            // Character image data
+}
+
+// Font, font texture and GlyphInfo array data
+struct Font 
+{
+    int baseSize;           // Base size (default chars height)
+    int glyphCount;         // Number of glyph characters
+    int glyphPadding;       // Padding around the glyph characters
+    Texture2D texture;      // Texture atlas containing the glyphs
+    Rectangle *recs;        // Rectangles in texture for the glyphs
+    GlyphInfo *glyphs;      // Glyphs info data
+}
+
+// Camera, defines position/orientation in 3d space
+struct Camera3D 
+{
+    Vector3 position;       // Camera position
+    Vector3 target;         // Camera target it looks-at
+    Vector3 up;             // Camera up vector (rotation over its axis)
+    float fovy;             // Camera field-of-view apperture in Y (degrees) in perspective, used as near plane width in orthographic
+    int projection;         // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+}
+
+define Camera = Camera3D;    // Camera type fallback, defaults to Camera3D
+
+// Camera2D, defines position/orientation in 2d space
+struct Camera2D 
+{
+    Vector2 offset;         // Camera offset (displacement from target)
+    Vector2 target;         // Camera target (rotation and zoom origin)
+    float rotation;         // Camera rotation in degrees
+    float zoom;             // Camera zoom (scaling), should be 1.0f by default
+}
+
+// Mesh, vertex data and vao/vbo
+struct Mesh 
+{
+    int vertexCount;        // Number of vertices stored in arrays
+    int triangleCount;      // Number of triangles stored (indexed or not)
+
+    // Vertex attributes data
+    float* vertices;        // Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
+    float* texcoords;       // Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
+    float* texcoords2;      // Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
+    float* normals;         // Vertex normals (XYZ - 3 components per vertex) (shader-location = 2)
+    float* tangents;        // Vertex tangents (XYZW - 4 components per vertex) (shader-location = 4)
+    char* colors;           // Vertex colors (RGBA - 4 components per vertex) (shader-location = 3)
+    ushort *indices;        // Vertex indices (in case vertex data comes indexed)
+
+    // Animation vertex data
+    float* animVertices;    // Animated vertex positions (after bones transformations)
+    float* animNormals;     // Animated normals (after bones transformations)
+    char* boneIds;          // Vertex bone ids, max 255 bone ids, up to 4 bones influence by vertex (skinning)
+    float *boneWeights;     // Vertex bone weight, up to 4 bones influence by vertex (skinning)
+
+    // OpenGL identifiers
+    uint vaoId;             // OpenGL Vertex Array Object id
+    uint* vboId;            // OpenGL Vertex Buffer Objects id (default vertex data)
+}
+
+// Shader
+struct Shader 
+{
+    uint id;                // Shader program id
+    int* locs;              // Shader locations array (RL_MAX_SHADER_LOCATIONS)
+}
+
+// MaterialMap
+struct MaterialMap 
+{
+    Texture2D texture;      // Material map texture
+    Color color;            // Material map color
+    float value;            // Material map value
+}
+
+// Material, includes shader and maps
+struct Material 
+{
+    Shader shader;          // Material shader
+    MaterialMap* maps;      // Material maps array (MAX_MATERIAL_MAPS)
+    float[4] params;        // Material generic parameters (if required)
+}
+
+// Transform, vectex transformation data
+struct Transform 
+{
+    Vector3 translation;    // Translation
+    Quaternion rotation;    // Rotation
+    Vector3 scale;          // Scale
+}
+
+// Bone, skeletal animation bone
+struct BoneInfo 
+{
+    char[32] name;          // Bone name
+    int parent;             // Bone parent
+}
+
+// Model, meshes, materials and animation data
+struct Model 
+{
+    Matrix transform;       // Local transform matrix
+
+    int meshCount;          // Number of meshes
+    int materialCount;      // Number of materials
+    Mesh* meshes;           // Meshes array
+    Material* materials;    // Materials array
+    int* meshMaterial;      // Mesh material number
+
+    // Animation data
+    int boneCount;          // Number of bones
+    BoneInfo* bones;        // Bones information (skeleton)
+    Transform* bindPose;    // Bones base transformation (pose)
+}
+
+// ModelAnimation
+struct ModelAnimation 
+{
+    int boneCount;          // Number of bones
+    int frameCount;         // Number of animation frames
+    BoneInfo* bones;        // Bones information (skeleton)
+    Transform** framePoses; // Poses array by frame
+}
+
+// Ray, ray for raycasting
+struct Ray
+{
+    Vector3 position;       // Ray position (origin)
+    Vector3 direction;      // Ray direction
+}
+
+// RayCollision, ray hit information
+struct RayCollision 
+{
+    bool hit;               // Did the ray hit something?
+    float distance;         // Distance to nearest hit
+    Vector3 point;          // Point of nearest hit
+    Vector3 normal;         // Surface normal of hit
+}
+
+// BoundingBox
+struct BoundingBox 
+{
+    Vector3 min;            // Minimum vertex box-corner
+    Vector3 max;            // Maximum vertex box-corner
+}
+
+// Wave, audio wave data
+struct Wave 
+{
+    uint frameCount;            // Total number of frames (considering channels)
+    uint sampleRate;            // Frequency (samples per second)
+    uint sampleSize;            // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
+    uint channels;              // Number of channels (1-mono, 2-stereo, ...)
+    void* data;                 // Buffer data pointer
+}
+
+define AudioBufferRef = void*;
+
+// AudioStream, custom audio stream
+struct AudioStream 
+{
+    AudioBufferRef buffer;      // Pointer to internal data used by the audio system
+
+    uint sampleRate;            // Frequency (samples per second)
+    uint sampleSize;            // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
+    uint channels;              // Number of channels (1-mono, 2-stereo, ...)
+}
+
+// Sound
+struct Sound 
+{
+    AudioStream stream;         // Audio stream
+    uint frameCount;            // Total number of frames (considering channels)
+}
+
+// Music, audio stream, anything longer than ~10 seconds should be streamed
+struct Music 
+{
+    AudioStream stream;         // Audio stream
+    uint frameCount;            // Total number of frames (considering channels)
+    bool looping;               // Music looping enable
+
+    int ctxType;                // Type of music context (audio filetype)
+    void* ctxData;              // Audio context data, depends on type
+}
+
+// VrDeviceInfo, Head-Mounted-Display device parameters
+struct VrDeviceInfo 
+{
+    int hResolution;                // Horizontal resolution in pixels
+    int vResolution;                // Vertical resolution in pixels
+    float hScreenSize;              // Horizontal size in meters
+    float vScreenSize;              // Vertical size in meters
+    float vScreenCenter;            // Screen center in meters
+    float eyeToScreenDistance;      // Distance between eye and display in meters
+    float lensSeparationDistance;   // Lens separation distance in meters
+    float interpupillaryDistance;   // IPD (distance between pupils) in meters
+    float[4] lensDistortionValues;  // Lens distortion constant parameters
+    float[4] chromaAbCorrection;    // Chromatic aberration correction parameters
+}
+
+// VrStereoConfig, VR stereo rendering configuration for simulator
+struct VrStereoConfig 
+{
+    Matrix[2] projection;           // VR projection matrices (per eye)
+    Matrix[2] viewOffset;           // VR view offset matrices (per eye)
+    float[2] leftLensCenter;        // VR left lens center
+    float[2] rightLensCenter;       // VR right lens center
+    float[2] leftScreenCenter;      // VR left screen center
+    float[2] rightScreenCenter;     // VR right screen center
+    float[2] scale;                 // VR distortion scale
+    float[2] scaleIn;               // VR distortion scale in
+}
+
+
+// Trace log level
+// NOTE: Organized by priority level
+enum TraceLogLevel : int
+{
+    ALL,            // Display all logs (0)
+    TRACE,          // Trace logging, intended for internal use only
+    DEBUG,          // Debug logging, used for internal debugging, it should be disabled on release builds
+    INFO,           // Info logging, used for program execution info
+    WARNING,        // Warning logging, used on recoverable failures
+    ERROR,          // Error logging, used on unrecoverable failures
+    FATAL,          // Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    NONE            // Disable logging
+}
+
+
+// Mouse buttons
+enum MouseButton : int
+{
+    BUTTON_LEFT,       // Mouse button left
+    BUTTON_RIGHT,      // Mouse button right
+    BUTTON_MIDDLE,     // Mouse button middle (pressed wheel)
+    BUTTON_SIDE,       // Mouse button side (advanced mouse device)
+    BUTTON_EXTRA,      // Mouse button extra (advanced mouse device)
+    BUTTON_FORWARD,    // Mouse button fordward (advanced mouse device)
+    BUTTON_BACK,       // Mouse button back (advanced mouse device)
+} 
+
+// Mouse cursor
+enum MouseCursor : int
+{
+    CURSOR_DEFAULT,       // Default pointer shape
+    CURSOR_ARROW,         // Arrow shape
+    CURSOR_IBEAM,         // Text writing cursor shape
+    CURSOR_CROSSHAIR,     // Cross shape
+    CURSOR_POINTING_HAND, // Pointing hand cursor
+    CURSOR_RESIZE_EW,     // Horizontal resize/move arrow shape
+    CURSOR_RESIZE_NS,     // Vertical resize/move arrow shape
+    CURSOR_RESIZE_NWSE,   // Top-left to bottom-right diagonal resize/move arrow shape
+    CURSOR_RESIZE_NESW,   // The top-right to bottom-left diagonal resize/move arrow shape
+    CURSOR_RESIZE_ALL,    // The omni-directional resize/move cursor shape
+    CURSOR_NOT_ALLOWED    // The operation-not-allowed shape
+}
+
+$assert(MouseCursor.CURSOR_DEFAULT == 0);
+
+// Gamepad buttons
+enum GamepadButton : int 
+{
+    UNKNOWN,             // Unknown button, just for error checking
+    LEFT_FACE_UP,        // Gamepad left DPAD up button
+    LEFT_FACE_RIGHT,     // Gamepad left DPAD right button
+    LEFT_FACE_DOWN,      // Gamepad left DPAD down button
+    LEFT_FACE_LEFT,      // Gamepad left DPAD left button
+    RIGHT_FACE_UP,       // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+    RIGHT_FACE_RIGHT,    // Gamepad right button right (i.e. PS3: Square, Xbox: X)
+    RIGHT_FACE_DOWN,     // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+    RIGHT_FACE_LEFT,     // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+    LEFT_TRIGGER_1,      // Gamepad top/back trigger left (first), it could be a trailing button
+    LEFT_TRIGGER_2,      // Gamepad top/back trigger left (second), it could be a trailing button
+    RIGHT_TRIGGER_1,     // Gamepad top/back trigger right (one), it could be a trailing button
+    RIGHT_TRIGGER_2,     // Gamepad top/back trigger right (second), it could be a trailing button
+    MIDDLE_LEFT,         // Gamepad center buttons, left one (i.e. PS3: Select)
+    MIDDLE,              // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+    MIDDLE_RIGHT,        // Gamepad center buttons, right one (i.e. PS3: Start)
+    LEFT_THUMB,          // Gamepad joystick pressed button left
+    RIGHT_THUMB          // Gamepad joystick pressed button right
+} 
+
+$assert(GamepadButton.UNKNOWN == 0);
+
+enum GamepadAxis : int
+{
+    LEFT_X,           // Gamepad left stick X axis
+    LEFT_Y,           // Gamepad left stick Y axis
+    RIGHT_X,          // Gamepad right stick X axis
+    RIGHT_Y,          // Gamepad right stick Y axis
+    LEFT_TRIGGER,     // Gamepad back trigger left, pressure level: [1..-1]
+    RIGHT_TRIGGER     // Gamepad back trigger right, pressure level: [1..-1]
+}
+
+$assert(GamepadAxis.LEFT_X == 0);
+
+// Material map index
+enum MaterialMapIndex : int
+{
+    ALBEDO,            // Albedo material (same as: MATERIAL_MAP_DIFFUSE)
+    METALNESS,         // Metalness material (same as: MATERIAL_MAP_SPECULAR)
+    NORMAL,            // Normal material
+    ROUGHNESS,         // Roughness material
+    OCCLUSION,         // Ambient occlusion material
+    EMISSION,          // Emission material
+    HEIGHT,            // Heightmap material
+    CUBEMAP,           // Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    IRRADIANCE,        // Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    PREFILTER,         // Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    BRDF               // Brdf material
+}
+
+$assert(MaterialMapIndex.ALBEDO == 0);
+
+// #define MATERIAL_MAP_DIFFUSE      MATERIAL_MAP_ALBEDO
+// #define MATERIAL_MAP_SPECULAR     MATERIAL_MAP_METALNESS
+
+// Shader location index
+enum ShaderLocationIndex : int 
+{
+    VERTEX_POSITION,     // Shader location: vertex attribute: position
+    VERTEX_TEXCOORD01,   // Shader location: vertex attribute: texcoord01
+    VERTEX_TEXCOORD02,   // Shader location: vertex attribute: texcoord02
+    VERTEX_NORMAL,       // Shader location: vertex attribute: normal
+    VERTEX_TANGENT,      // Shader location: vertex attribute: tangent
+    VERTEX_COLOR,        // Shader location: vertex attribute: color
+    MATRIX_MVP,          // Shader location: matrix uniform: model-view-projection
+    MATRIX_VIEW,         // Shader location: matrix uniform: view (camera transform)
+    MATRIX_PROJECTION,   // Shader location: matrix uniform: projection
+    MATRIX_MODEL,        // Shader location: matrix uniform: model (transform)
+    MATRIX_NORMAL,       // Shader location: matrix uniform: normal
+    VECTOR_VIEW,         // Shader location: vector uniform: view
+    COLOR_DIFFUSE,       // Shader location: vector uniform: diffuse color
+    COLOR_SPECULAR,      // Shader location: vector uniform: specular color
+    COLOR_AMBIENT,       // Shader location: vector uniform: ambient color
+    MAP_ALBEDO,          // Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)
+    MAP_METALNESS,       // Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)
+    MAP_NORMAL,          // Shader location: sampler2d texture: normal
+    MAP_ROUGHNESS,       // Shader location: sampler2d texture: roughness
+    MAP_OCCLUSION,       // Shader location: sampler2d texture: occlusion
+    MAP_EMISSION,        // Shader location: sampler2d texture: emission
+    MAP_HEIGHT,          // Shader location: sampler2d texture: height
+    MAP_CUBEMAP,         // Shader location: samplerCube texture: cubemap
+    MAP_IRRADIANCE,      // Shader location: samplerCube texture: irradiance
+    MAP_PREFILTER,       // Shader location: samplerCube texture: prefilter
+    MAP_BRDF             // Shader location: sampler2d texture: brdf
+}
+
+$assert(ShaderLocationIndex.VERTEX_POSITION == 0);
+
+//#define SHADER_LOC_MAP_DIFFUSE      SHADER_LOC_MAP_ALBEDO
+//#define SHADER_LOC_MAP_SPECULAR     SHADER_LOC_MAP_METALNESS
+
+// Shader uniform data type
+enum ShaderUniformDataType 
+{
+    FLOAT,           // Shader uniform type: float
+    VEC2,            // Shader uniform type: vec2 (2 float)
+    VEC3,            // Shader uniform type: vec3 (3 float)
+    VEC4,            // Shader uniform type: vec4 (4 float)
+    INT,             // Shader uniform type: int
+    IVEC2,           // Shader uniform type: ivec2 (2 int)
+    IVEC3,           // Shader uniform type: ivec3 (3 int)
+    IVEC4,           // Shader uniform type: ivec4 (4 int)
+    SAMPLER2D        // Shader uniform type: sampler2d
+}
+
+$assert(ShaderUniformDataType.FLOAT == 0);
+
+// Shader attribute data types
+enum ShaderAttributeDataType
+{
+    FLOAT,            // Shader attribute type: float
+    VEC2,             // Shader attribute type: vec2 (2 float)
+    VEC3,             // Shader attribute type: vec3 (3 float)
+    VEC4              // Shader attribute type: vec4 (4 float)
+}
+
+$assert(ShaderAttributeDataType.FLOAT == 0);
+
+// Pixel formats
+// NOTE: Support depends on OpenGL version and platform
+enum PixelFormat : int
+{
+	NONE,
+    UNCOMPRESSED_GRAYSCALE,     // 8 bit per pixel (no alpha)
+    UNCOMPRESSED_GRAY_ALPHA,    // 8*2 bpp (2 channels)
+    UNCOMPRESSED_R5G6B5,        // 16 bpp
+    UNCOMPRESSED_R8G8B8,        // 24 bpp
+    UNCOMPRESSED_R5G5B5A1,      // 16 bpp (1 bit alpha)
+    UNCOMPRESSED_R4G4B4A4,      // 16 bpp (4 bit alpha)
+    UNCOMPRESSED_R8G8B8A8,      // 32 bpp
+    UNCOMPRESSED_R32,           // 32 bpp (1 channel - float)
+    UNCOMPRESSED_R32G32B32,     // 32*3 bpp (3 channels - float)
+    UNCOMPRESSED_R32G32B32A32,  // 32*4 bpp (4 channels - float)
+    COMPRESSED_DXT1_RGB,        // 4 bpp (no alpha)
+    COMPRESSED_DXT1_RGBA,       // 4 bpp (1 bit alpha)
+    COMPRESSED_DXT3_RGBA,       // 8 bpp
+    COMPRESSED_DXT5_RGBA,       // 8 bpp
+    COMPRESSED_ETC1_RGB,        // 4 bpp
+    COMPRESSED_ETC2_RGB,        // 4 bpp
+    COMPRESSED_ETC2_EAC_RGBA,   // 8 bpp
+    COMPRESSED_PVRT_RGB,        // 4 bpp
+    COMPRESSED_PVRT_RGBA,       // 4 bpp
+    COMPRESSED_ASTC_4X4_RGBA,   // 8 bpp
+    COMPRESSED_ASTC_8X8_RGBA    // 2 bpp
+}
+
+$assert(PixelFormat.UNCOMPRESSED_GRAYSCALE == 1);
+
+// Texture parameters: filter mode
+// NOTE 1: Filtering considers mipmaps if available in the texture
+// NOTE 2: Filter is accordingly set for minification and magnification
+enum TextureFilter : int
+{
+    POINT,                   // No filter, just pixel approximation
+    BILINEAR,                // Linear filtering
+    TRILINEAR,               // Trilinear filtering (linear with mipmaps)
+    ANISOTROPIC_4X,          // Anisotropic filtering 4x
+    ANISOTROPIC_8X,          // Anisotropic filtering 8x
+    ANISOTROPIC_16X,         // Anisotropic filtering 16x
+}
+
+$assert(TextureFilter.POINT == 0);
+
+// Texture parameters: wrap mode
+enum TextureWrap 
+{
+    REPEAT,                    // Repeats texture in tiled mode
+    CLAMP,                     // Clamps texture to edge pixel in tiled mode
+    MIRROR_REPEAT,             // Mirrors and repeats the texture in tiled mode
+    MIRROR_CLAMP               // Mirrors and clamps to border the texture in tiled mode
+}
+
+$assert(TextureWrap.REPEAT == 0);
+
+// Cubemap layouts
+enum CubemapLayout
+{
+    AUTO_DETECT,             // Automatically detect layout type
+    LINE_VERTICAL,           // Layout is defined by a vertical line with faces
+    LINE_HORIZONTAL,         // Layout is defined by an horizontal line with faces
+    CROSS_THREE_BY_FOUR,     // Layout is defined by a 3x4 cross with cubemap faces
+    CROSS_FOUR_BY_THREE,     // Layout is defined by a 4x3 cross with cubemap faces
+    PANORAMA                 // Layout is defined by a panorama image (equirectangular map)
+}
+
+$assert(CubemapLayout.AUTO_DETECT == 0);
+
+// Font type, defines generation method
+enum FontType
+{
+    DEFAULT,                   // Default font generation, anti-aliased
+    BITMAP,                    // Bitmap font generation, no anti-aliasing
+    SDF                        // SDF font generation, requires external shader
+}
+
+$assert(FontType.DEFAULT == 0);
+
+// Color blending modes (pre-defined)
+enum BlendMode : int
+{
+    ALPHA,                    // Blend textures considering alpha (default)
+    ADDITIVE,                 // Blend textures adding colors
+    MULTIPLIED,               // Blend textures multiplying colors
+    ADD_COLORS,               // Blend textures adding colors (alternative)
+    SUBTRACT_COLORS,          // Blend textures subtracting colors (alternative)
+    ALPHA_PREMUL,             // Blend premultiplied textures considering alpha
+    CUSTOM                    // Blend textures using custom src/dst factors (use rlSetBlendMode())
+}
+
+$assert(BlendMode.ALPHA == 0);
+
+
+// Camera system modes
+enum CameraMode
+{
+    CUSTOM,                  // Custom camera
+    FREE,                    // Free camera
+    ORBITAL,                 // Orbital camera
+    FIRST_PERSON,            // First person camera
+    THIRD_PERSON             // Third person camera
+}
+
+$assert(CameraMode.CUSTOM == 0);
+
+// Camera projection
+enum CameraProjection
+{
+    PERSPECTIVE,             // Perspective projection
+    ORTHOGRAPHIC             // Orthographic projection
+}
+
+$assert(CameraProjection.PERSPECTIVE == 0);
+
+// N-patch layout
+enum NPatchLayout 
+{
+    NINE_PATCH,              // Npatch layout: 3x3 tiles
+    THREE_PATCH_VERTICAL,    // Npatch layout: 1x3 tiles
+    THREE_PATCH_HORIZONTAL   // Npatch layout: 3x1 tiles
+}
+
+$assert(NPatchLayout.NINE_PATCH == 0);
+
+// Callbacks to hook some internal functions
+// WARNING: This callbacks are intended for advance users
+define LoadFileDataCallback = fn char* (char* fileName, uint* bytesRead);                     // FileIO: Load binary data
+define SaveFileDataCallback = fn bool(char* fileName, void* data, uint bytesToWrite);         // FileIO: Save binary data
+define LoadFileTextCallback = fn char*(char* fileName);                                       // FileIO: Load text data
+define SaveFileTextCallback = fn bool(char* fileName, char* text);                            // FileIO: Save text data
+                                                                                              
+// Window-related functions                                                                   
+fn void initWindow(int width, int height, char* title) @extname("InitWindow");              // Initialize window and OpenGL context
+fn bool windowShouldClose() @extname("WindowShouldClose");                                  // Check if KEY_ESCAPE pressed or Close icon pressed
+fn void closeWindow() @extname("CloseWindow");                                              // Close window and unload OpenGL context
+fn bool isWindowReady() @extname("IsWindowReady");                                          // Check if window has been initialized successfully
+fn bool isWindowFullscreen() @extname("IsWindowFullscreen");                                // Check if window is currently fullscreen
+fn bool isWindowHidden() @extname("IsWindowHidden");                                        // Check if window is currently hidden (only PLATFORM_DESKTOP)
+fn bool isWindowMinimized() @extname("IsWindowMinimized");                                  // Check if window is currently minimized (only PLATFORM_DESKTOP)
+fn bool isWindowMaximized() @extname("IsWindowMaximized");                                  // Check if window is currently maximized (only PLATFORM_DESKTOP)
+fn bool isWindowFocused() @extname("IsWindowFocused");                                      // Check if window is currently focused (only PLATFORM_DESKTOP)
+fn bool isWindowResized() @extname("IsWindowResized");                                      // Check if window has been resized last frame
+fn bool isWindowState(uint flag) @extname("IsWindowState");                                 // Check if one specific window flag is enabled
+fn void setWindowState(uint flag) @extname("SetWindowState");                               // Set window configuration state using flags (only PLATFORM_DESKTOP)
+fn void clearWindowState(uint flags) @extname("ClearWindowState");                          // Clear window configuration state flags
+fn void toggleFullscreen() @extname("ToggleFullscreen");                                    // Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)
+fn void maximizeWindow() @extname("MaximizeWindow");                                        // Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
+fn void minimizeWindow() @extname("MinimizeWindow");                                        // Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
+fn void restoreWindow() @extname("RestoreWindow");                                          // Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
+fn void setWindowIcon(Image image) @extname("SetWindowIcon");                               // Set icon for window (only PLATFORM_DESKTOP)
+fn void setWindowTitle(char* title) @extname("SetWindowTitle");                             // Set title for window (only PLATFORM_DESKTOP)
+fn void setWindowPosition(int x, int y) @extname("SetWindowPosition");                      // Set window position on screen (only PLATFORM_DESKTOP)
+fn void setWindowMonitor(int monitor) @extname("SetWindowMonitor(int monitor");             // Set monitor for the current window (fullscreen mode)
+fn void setWindowMinSize(int width, int height) @extname("SetWindowMinSize");               // Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+fn void setWindowSize(int width, int height) @extname("SetWindowSize");                     // Set window dimensions
+fn void setWindowOpacity(float opacity) @extname("SetWindowOpacity");                       // Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
+fn void* getWindowHandle() @extname("GetWindowHandle");                                     // Get native window handle
+fn int getScreenWidth() @extname("GetScreenWidth");                                         // Get current screen width
+fn int getScreenHeight() @extname("GetScreenHeight");                                       // Get current screen height
+fn int getRenderWidth() @extname("GetRenderWidth");                                         // Get current render width (it considers HiDPI)
+fn int getRenderHeight() @extname("GetRenderHeight");                                       // Get current render height (it considers HiDPI)
+fn int getMonitorCount() @extname("GetMonitorCount");                                       // Get number of connected monitors
+fn int getCurrentMonitor() @extname("GetCurrentMonitor");                                   // Get current connected monitor
+fn Vector2 getMonitorPosition(int monitor) @extname("GetMonitorPosition");                  // Get specified monitor position
+fn int getMonitorWidth(int monitor) @extname("GetMonitorWidth");                            // Get specified monitor width (max available by monitor)
+fn int getMonitorHeight(int monitor) @extname("GetMonitorHeight");                          // Get specified monitor height (max available by monitor)
+fn int getMonitorPhysicalWidth(int monitor) @extname("GetMonitorPhysicalWidth");            // Get specified monitor physical width in millimetres
+fn int getMonitorPhysicalHeight(int monitor) @extname("GetMonitorPhysicalHeight");          // Get specified monitor physical height in millimetres
+fn int getMonitorRefreshRate(int monitor) @extname("GetMonitorRefreshRate");                // Get specified monitor refresh rate
+fn Vector2 getWindowPosition() @extname("GetWindowPosition");                               // Get window position XY on monitor
+fn Vector2 getWindowScaleDPI() @extname("GetWindowScaleDPI");                               // Get window scale DPI factor
+fn char* getMonitorName(int monitor) @extname("GetMonitorName");                            // Get the human-readable, UTF-8 encoded name of the primary monitor
+fn void setClipboardText(char* text) @extname("SetClipboardText(char* text");               // Set clipboard text content
+fn char* getClipboardText() @extname("GetClipboardText");                                   // Get clipboard text content
+fn void enableEventWaiting() @extname("EnableEventWaiting");                                // Enable waiting for events on EndDrawing(), no automatic event polling
+fn void disableEventWaiting() @extname("DisableEventWaiting");                              // Disable waiting for events on EndDrawing(), automatic events polling
+
+// Custom frame control functions
+// NOTE: Those functions are intended for advance users that want full control over the frame processing
+// By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
+// To avoid that behaviour and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+fn void swapScreenBuffer() @extname("SwapScreenBuffer");                                    // Swap back buffer with front buffer (screen drawing)
+fn void pollInputEvents() @extname("PollInputEvents");                                      // Register all input events
+fn void waitTime(float ms) @extname("WaitTime");                                             // Wait for some milliseconds (halt program execution)
+                                                                                              
+// Cursor-related functions                                                                   
+fn void showCursor() @extname("ShowCursor");                                                 // Shows cursor
+fn void hideCursor() @extname("HideCursor");                                                 // Hides cursor
+fn bool isCursorHidden() @extname("IsCursorHidden");                                        // Check if cursor is not visible
+fn void enableCursor() @extname("EnableCursor");                                             // Enables cursor (unlock cursor)
+fn void disableDursor() @extname("DisableCursor");                                           // Disables cursor (lock cursor)
+fn bool isCursorOnScreen() @extname("IsCursorOnScreen");                                   // Check if cursor is on the screen
+
+// Drawing-related functions
+fn void clearBackground(Color color) @extname("ClearBackground");                            // Set background color (framebuffer clear color)
+fn void beginDrawing() @extname("BeginDrawing");                                             // Setup canvas (framebuffer) to start drawing
+fn void endDrawing() @extname("EndDrawing");                                                 // End canvas drawing and swap buffers (double buffering)
+fn void beginMode2D(Camera2D camera) @extname("BeginMode2D");                                // Begin 2D mode with custom camera (2D)
+fn void endMode2D() @extname("EndMode2D");                                                   // Ends 2D mode with custom camera
+fn void beginMode3D(Camera3D camera) @extname("BeginMode3D");                                // Begin 3D mode with custom camera (3D)
+fn void endMode3D() @extname("EndMode3D");                                                   // Ends 3D mode and returns to default 2D orthographic mode
+fn void beginTextureMode(RenderTexture2D target) @extname("BeginTextureMode");              // Begin drawing to render texture
+fn void endTextureMode() @extname("EndTextureMode");                                        // Ends drawing to render texture
+fn void beginShaderMode(Shader shader) @extname("BeginShaderMode");                         // Begin custom shader drawing
+fn void endShaderMode() @extname("EndShaderMode");                                          // End custom shader drawing (use default shader)
+fn void beginBlendMode(int mode) @extname("BeginBlendMode");                                // Begin blending mode (alpha, additive, multiplied, subtract, custom)
+fn void endBlendMode() @extname("EndBlendMode");                                            // End blending mode (reset to default: alpha blending)
+fn void beginScissorMode(int x, int y, int w, int h) @extname("BeginScissorMode");          // Begin scissor mode (define screen area for following drawing)
+fn void endScissorMode() @extname("EndScissorMode");                                        // End scissor mode
+fn void beginVrStereoMode(VrStereoConfig config) @extname("BeginVrStereoMode");            // Begin stereo rendering (requires VR simulator)
+fn void endVrStereoMode() @extname("EndVrStereoMode");                                     // End stereo rendering (requires VR simulator)
+
+// VR stereo config functions for VR simulator
+fn VrStereoConfig loadVrStereoConfig(VrDeviceInfo device) @extname("LoadVrStereoConfig");  // Load VR stereo config for VR simulator device parameters
+fn void unloadVrStereoConfig(VrStereoConfig config) @extname("UnloadVrStereoConfig");      // Unload VR stereo config
+
+// Shader management functions
+// NOTE: Shader functionality is not available on OpenGL 1.1
+fn Shader loadShader(char* vsFileName, char* fsFileName) @extname("LoadShader");             // Load shader from files and bind default locations
+fn Shader loadShaderFromMemory(char* vs, char* fs) @extname("LoadShaderFromMemory");       // Load shader from code strings and bind default locations
+fn int getShaderLocation(Shader shader, char* uniformName) @extname("GetShaderLocation");   // Get shader uniform location
+fn int getShaderLocationAttrib(Shader shader, char* attr) @extname("GetShaderLocationAttrib");  // Get shader attribute location
+fn void setShaderValue(Shader shader, int locIndex, void* value, int uniformType) @extname("SetShaderValue"); // Set shader uniform value
+fn void setShaderValueV(Shader shader, int locIndex, void* value, int uniformType, int count) @extname("SetShaderValueV");   // Set shader uniform value vector
+fn void setShaderValueMatrix(Shader shader, int locIndex, Matrix mat) @extname("SetShaderValueMatrix"); // Set shader uniform value (matrix 4x4)
+fn void setShaderValueTexture(Shader shader, int locIndex, Texture2D texture) @extname("SetShaderValueTexture"); // Set shader uniform value for texture (sampler2d)
+fn void unloadShader(Shader shader) @extname("UnloadShader");                                // Unload shader from GPU memory (VRAM)
+
+// Screen-space-related functions
+fn Ray getMouseRay(Vector2 mousePosition, Camera camera) @extname("GetMouseRay");           // Get a ray trace from mouse position
+fn Matrix getCameraMatrix(Camera camera) @extname("GetCameraMatrix");                       // Get camera transform matrix (view matrix)
+fn Matrix getCameraMatrix2D(Camera2D camera) @extname("GetCameraMatrix2D");                 // Get camera 2d transform matrix
+fn Vector2 getWorldToScreen(Vector3 position, Camera camera) @extname("GetWorldToScreen"); // Get the screen space position for a 3d world space position
+fn Vector2 getWorldToScreenEx(Vector3 position, Camera camera, int width, int height) @extname("GetWorldToScreenEx"); // Get size position for a 3d world space position
+fn Vector2 getWorldToScreen2D(Vector2 position, Camera2D camera) @extname("GetWorldToScreen2D"); // Get the screen space position for a 2d camera world space position
+fn Vector2 getScreenToWorld2D(Vector2 position, Camera2D camera) @extname("GetScreenToWorld2D"); // Get the world space position for a 2d camera screen space position
+
+// Timing-related functions
+fn void setTargetFPS(int fps) @extname("SetTargetFPS");                                     // Set target FPS (maximum)
+fn int getFPS() @extname("GetFPS");                                                          // Get current FPS
+fn float getFrameTime() @extname("GetFrameTime");                                           // Get time in seconds for last frame drawn (delta time)
+fn double getTime() @extname("GetTime");                                                     // Get elapsed time in seconds since InitWindow()
+
+// Misc. functions
+fn int getRandomValue(int min, int max) @extname("GetRandomValue");                          // Get a random value between min and max (both included)
+fn void setRandomSeed(uint seed) @extname("SetRandomSeed");                                  // Set the seed for the random number generator
+fn void takeScreenshot(char* fileName) @extname("TakeScreenshot");                           // Takes a screenshot of current screen (filename extension defines format)
+fn void setConfigFlags(ConfigFlag flags) @extname("SetConfigFlags");                         // Setup init configuration flags (view FLAGS)
+
+fn void traceLog(TraceLogLevel logLevel, char* text, ...) @extname("TraceLog");              // Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+fn void setTraceLogLevel(TraceLogLevel logLevel) @extname("SetTraceLogLevel");               // Set the current threshold (minimum) log level
+fn void* memAlloc(int size) @extname("MemAlloc");                                            // Internal memory allocator
+fn void* memRealloc(void* ptr, int size) @extname("MemRealloc");                             // Internal memory reallocator
+fn void memFree(void* ptr) @extname("MemFree");                								 // Internal memory free
+
+// Set custom callbacks
+// WARNING: Callbacks setup is intended for advance users
+fn void setLoadFileDataCallback(LoadFileDataCallback callback) @extname("SetLoadFileDataCallback"); // Set custom file binary data loader
+fn void setSaveFileDataCallback(SaveFileDataCallback callback) @extname("SetSaveFileDataCallback"); // Set custom file binary data saver
+fn void setLoadFileTextCallback(LoadFileTextCallback callback) @extname("SetLoadFileTextCallback"); // Set custom file text data loader
+fn void setSaveFileTextCallback(SaveFileTextCallback callback) @extname("SetSaveFileTextCallback"); // Set custom file text data saver
+
+// Files management functions
+// Load file data as byte array (read)
+fn char* loadFileData(char* fileName, uint* bytesRead) @extname("LoadFileData");
+// Unload file data allocated by load_file_data()
+fn void unloadFileData(char* data) @extname("UnloadFileData");
+// Save data to file from byte array (write), returns true on success
+fn bool saveFileData(char* fileName, void* data, uint bytesToWrite) @extname("SaveFileData");
+// Load text data from file (read), returns a '\0' terminated string
+fn char* loadFileText(char* fileName) @extname("LoadFileText");
+// Unload file text data allocated by LoadFileText()
+fn void unloadFileText(char* text) @extname("UnloadFileText");
+// Save text data to file (write), string must be '\0' terminated, returns true on success
+fn bool saveFileText(char* fileName, char* text) @extname("SaveFileText");
+// Check if file exists
+fn bool fileExists(char* fileName) @extname("FileExists");
+// Check if a directory path exists
+fn bool directoryExists(char* dirPath) @extname("DirectoryExists");
+// Check file extension (including point: .png, .wav)
+fn bool isFileExtension(char* fileName, char* ext) @extname("IsFileExtension");
+// Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
+fn int getFileLength(char* fileName) @extname("GetFileLength");
+// Get pointer to extension for a filename string (includes dot: '.png')
+fn char* getFileExtension(char* fileName) @extname("GetFileExtension");
+// Get pointer to filename for a path string
+fn char* getFileName(char* filePath) @extname("GetFileName");
+// Get filename string without extension (uses static string)
+fn char* getFileNameWithoutExt(char* filePath) @extname("GetFileNameWithoutExt");
+// Get full path for a given fileName with path (uses static string)
+fn char* getDirectoryPath(char* filePath) @extname("GetDirectoryPath");
+// Get previous directory path for a given path (uses static string)
+fn char* getPrevDirectoryPath(char* dirPath) @extname("GetPrevDirectoryPath");
+// Get current working directory (uses static string)
+fn char* getWorkingDirectory() @extname("GetWorkingDirectory");
+// Get the directory if the running application (uses static string)
+fn char* getApplicationDirectory() @extname("GetApplicationDirectory");
+// Load directory filepaths
+fn FilePathList loadDirectoryFiles(char* dirPath, int* count) @extname("LoadDirectoryFiles");
+// Load directory filepaths with extension filtering and recursive directory scan
+fn FilePathList loadDirectoryFilesEx(char* basePath, char* filter, bool scanSubdirs) @extname("LoadDirectoryFilesEx");
+// Load dropped filepaths
+fn FilePathList loadDroppedFiles() @extname("LoadDroppedFiles");
+// Clear directory files paths buffers (free memory)
+fn void unloadDirectoryFiles() @extname("UnloadDirectoryFiles");
+// Change working directory, return true on success
+fn bool changeDirectory(char* dir) @extname("ChangeDirectory");
+// Check if a given path is a file or a directory
+fn bool isPathFile(char* path) @extname("IsPathFile");
+// Check if a file has been dropped into window
+fn bool isFileDropped() @extname("IsFileDropped");
+// Unload dropped filepaths
+fn void unloadDroppedFiles(FilePathList files) @extname("UnloadDroppedFiles");
+// Get file modification time (last write time)
+fn CLong getFileModTime(char* fileName) @extname("GetFileModTime");
+
+// Compression/Encoding functionality
+// Compress data (DEFLATE algorithm)
+fn char* compressData(char* data, int dataLength, int *compDataLength) @extname("CompressData");        
+// Decompress data (DEFLATE algorithm)
+fn char* decompressData(char* compData, int compDataLength, int *dataLength) @extname("DecompressData");  
+// Encode data to Base64 string
+fn char* encodeDataBase64(char* data, int dataLength, int *outputLength) @extname("EncodeDataBase64");
+// Decode Base64 string data         
+fn char* decodeDataBase64(char* data, int *outputLength) @extname("DecodeDataBase64");                      
+         
+
+ // Open URL with default system browser (if available)
+fn void openURL(char* url) @extname("OpenURL");                             
+
+//------------------------------------------------------------------------------------
+// Input Handling Functions (Module: core)
+//------------------------------------------------------------------------------------
+
+// Input-related functions: keyboard
+// Check if a key has been pressed once
+fn bool isKeyPressed(KeyboardKey key) @extname("IsKeyPressed");
+// Check if a key is being pressed
+fn bool isKeyDown(KeyboardKey key) @extname("IsKeyDown");
+// Check if a key has been released once
+fn bool isKeyReleased(KeyboardKey key) @extname("IsKeyReleased");
+// Check if a key is NOT being pressed
+fn bool isKeyUp(KeyboardKey key) @extname("IsKeyUp");
+// Set a custom key to exit program (default is ESC)
+fn void setExitKey(KeyboardKey key) @extname("SetExitKey");
+// Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
+fn int getKeyPressed() @extname("GetKeyPressed");                                
+// Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
+fn int getCharPressed() @extname("GetCharPressed");                               
+
+// Input-related functions: gamepads
+// Check if a gamepad is available
+fn bool isGamepadAvailable(int gamepad) @extname("IsGamepadAvailable");
+// Get gamepad internal name id
+fn char* getGamepadName(int gamepad) @extname("GetGamepadName");
+// Check if a gamepad button has been pressed once
+fn bool isGamepadButtonPressed(int gamepad, int button) @extname("IsGamepadButtonPressed");
+// Check if a gamepad button is being pressed
+fn bool isGamepadButtonDown(int gamepad, int button) @extname("IsGamepadButtonDown");
+// Check if a gamepad button has been released once
+fn bool isGamepadButtonReleased(int gamepad, int button) @extname("IsGamepadButtonReleased");
+// Check if a gamepad button is NOT being pressed
+fn bool isGamepadButtonUp(int gamepad, int button) @extname("IsGamepadButtonUp");
+// Get the last gamepad button pressed
+fn int getGamepadButtonPressed() @extname("GetGamepadButtonPressed");
+// Get gamepad axis count for a gamepad
+fn int getGamepadAxisCount(int gamepad) @extname("GetGamepadAxisCount");
+// Get axis movement value for a gamepad axis
+fn float getGamepadAxisMovement(int gamepad, int axis) @extname("GetGamepadAxisMovement");
+// Set internal gamepad mappings (SDL_GameControllerDB)
+fn int setGamepadMappings(char* mappings) @extname("SetGamepadMappings");
+
+// Input-related functions: mouse
+// Check if a mouse button has been pressed once
+fn bool isMouseButtonPressed(int button) @extname("IsMouseButtonPressed");
+// Check if a mouse button is being pressed
+fn bool isMouseButtonDown(int button) @extname("IsMouseButtonDown");
+// Check if a mouse button has been released once
+fn bool isMouseButtonReleased(int button) @extname("IsMouseButtonReleased");
+// Check if a mouse button is NOT being pressed
+fn bool isMouseButtonUp(int button) @extname("IsMouseButtonUp");
+// Get mouse position X
+fn int getMouseX() @extname("GetMouseX");
+// Get mouse position Y
+fn int getMouseY() @extname("GetMouseY");
+// Get mouse position XY
+fn Vector2 getMousePosition() @extname("GetMousePosition");
+// Get mouse delta between frames
+fn Vector2 getMouseDelta() @extname("GetMouseDelta");
+// Set mouse position XY
+fn void setMousePosition(int x, int y) @extname("SetMousePosition");
+// Set mouse offset
+fn void setMouseOffset(int offsetX, int offsetY) @extname("SetMouseOffset");
+// Set mouse scaling
+fn void setMouseScale(float scaleX, float scaleY) @extname("SetMouseScale");
+// Get mouse wheel movement Y
+fn float getMouseWheelMove() @extname("GetMouseWheelMove");
+// Get mouse wheel movement for both X and Y
+fn Vector2 getMouseWheelMoveV() @extname("GetMouseWheelMoveV");
+// Set mouse cursor
+fn void setMouseCursor(int cursor) @extname("SetMouseCursor");
+
+// Input-related functions: touch
+// Get touch position X for touch point 0 (relative to screen size)
+fn int getTouchX() @extname("GetTouchX");
+// Get touch position Y for touch point 0 (relative to screen size)
+fn int getTouchY() @extname("GetTouchY");
+// Get touch position XY for a touch point index (relative to screen size)
+fn Vector2 getTouchPosition(int index) @extname("GetTouchPosition");
+// Get touch point identifier for given index
+fn int getTouchPointId(int index) @extname("GetTouchPointId");
+// Get number of touch points
+fn int getTouchPointCount() @extname("GetTouchPointCount");
+
+//------------------------------------------------------------------------------------
+// Gestures and Touch Handling Functions (Module: rgestures)
+//------------------------------------------------------------------------------------
+// Enable a set of gestures using flags
+fn void setGesturesEnabled(Gesture flags) @extname("SetGesturesEnabled");
+// Check if a gesture have been detected
+fn bool isGestureDetected(Gesture gesture) @extname("IsGestureDetected");
+// Get latest detected gesture
+fn Gesture getGestureDetected() @extname("GetGestureDetected");
+// Get gesture hold time in milliseconds
+fn float getGestureHoldDuration() @extname("GetGestureHoldDuration");
+// Get gesture drag vector
+fn Vector2 getGestureDragVector() @extname("GetGestureDragVector");
+// Get gesture drag angle
+fn float getGestureDragAngle() @extname("GetGestureDragAngle");
+// Get gesture pinch delta
+fn Vector2 getGesturePinchVector() @extname("GetGesturePinchVector");
+// Get gesture pinch angle
+fn float getGesturePinchAngle() @extname("GetGesturePinchAngle");
+
+//------------------------------------------------------------------------------------
+// Camera System Functions (Module: rcamera)
+//------------------------------------------------------------------------------------
+// Set camera mode (multiple camera modes available)
+fn void setCameraMode(Camera camera, int mode) @extname("SetCameraMode");
+// Update camera position for selected mode
+fn void updateCamera(Camera *camera) @extname("UpdateCamera");                
+
+// Set camera pan key to combine with mouse movement (free camera)
+fn void setCameraPanControl(int keyPan) @extname("SetCameraPanControl");
+// Set camera alt key to combine with mouse movement (free camera)
+fn void setCameraAltControl(int keyAlt) @extname("SetCameraAltControl");
+// Set camera smooth zoom key to combine with mouse (free camera)
+fn void setCameraSmoothZoomControl(int keySmoothZoom) @extname("SetCameraSmoothZoomControl");
+// Set camera move controls (1st person and 3rd person cameras)
+fn void setCameraMoveControls(int keyFront, int keyBack, int keyRight, int keyLeft, int keyUp, int keyDown) @extname("SetCameraMoveControls");
+
+//------------------------------------------------------------------------------------
+// Basic Shapes Drawing Functions (Module: shapes)
+//------------------------------------------------------------------------------------
+// Set texture and rectangle to be used on shapes drawing
+// NOTE: It can be useful when using basic shapes and one single font,
+// defining a font char white rectangle would allow drawing everything in a single draw call
+// Set texture and rectangle to be used on shapes drawing
+fn void setShapesTexture(Texture2D texture, Rectangle source) @extname("SetShapesTexture");
+
+// Basic shapes drawing functions
+// Draw a pixel
+fn void drawPixel(int posX, int posY, Color color) @extname("DrawPixel");
+// Draw a pixel (Vector version)
+fn void drawPixelV(Vector2 position, Color color) @extname("DrawPixelV");
+// Draw a line
+fn void drawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color) @extname("DrawLine");
+// Draw a line (Vector version)
+fn void drawLineV(Vector2 startPos, Vector2 endPos, Color color) @extname("DrawLineV");
+// Draw a line defining thickness
+fn void drawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color) @extname("DrawLineEx");
+// Draw a line using cubic-bezier curves in-out
+fn void drawLineBezier(Vector2 startPos, Vector2 endPos, float thick, Color color) @extname("DrawLineBezier");
+// Draw line using quadratic bezier curves with a control point
+fn void drawLineBezierQuad(Vector2 startPos, Vector2 endPos, Vector2 controlPos, float thick, Color color) @extname("DrawLineBezierQuad");
+// Draw line using cubic bezier curves with 2 control points
+fn void drawLineBezierCubic(Vector2 startPos, Vector2 endPos, Vector2 startControlPos, Vector2 endControlPos, float thick, Color color) @extname("DrawLineBezierCubic");
+// Draw lines sequence
+fn void drawLineStrip(Vector2 *points, int pointCount, Color color) @extname("DrawLineStrip");
+// Draw a color-filled circle
+fn void drawCircle(int centerX, int centerY, float radius, Color color) @extname("DrawCircle");
+// Draw a piece of a circle
+fn void drawCircleSector(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color) @extname("DrawCircleSector");
+// Draw circle sector outline
+fn void drawCircleSectorLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color) @extname("DrawCircleSectorLines");
+// Draw a gradient-filled circle
+fn void drawCircleGradient(int centerX, int centerY, float radius, Color color1, Color color2) @extname("DrawCircleGradient");
+// Draw a color-filled circle (Vector version)
+fn void drawCircleV(Vector2 center, float radius, Color color) @extname("DrawCircleV");
+// Draw circle outline
+fn void drawCircleLines(int centerX, int centerY, float radius, Color color) @extname("DrawCircleLines");
+// Draw ellipse
+fn void drawEllipse(int centerX, int centerY, float radiusH, float radiusV, Color color) @extname("DrawEllipse");
+// Draw ellipse outline
+fn void drawEllipseLines(int centerX, int centerY, float radiusH, float radiusV, Color color) @extname("DrawEllipseLines");
+// Draw ring
+fn void drawRing(Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color) @extname("DrawRing");
+// Draw ring outline
+fn void drawRingLines(Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color) @extname("DrawRingLines");
+// Draw a color-filled rectangle
+fn void drawRectangle(int posX, int posY, int width, int height, Color color) @extname("DrawRectangle");
+// Draw a color-filled rectangle (Vector version)
+fn void drawRectangleV(Vector2 position, Vector2 size, Color color) @extname("DrawRectangleV");
+// Draw a color-filled rectangle
+fn void drawRectangleRec(Rectangle rec, Color color) @extname("DrawRectangleRec");
+// Draw a color-filled rectangle with pro parameters
+fn void drawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color) @extname("DrawRectanglePro");
+// Draw a vertical-gradient-filled rectangle
+fn void drawRectangleGradientV(int posX, int posY, int width, int height, Color color1, Color color2) @extname("DrawRectangleGradientV");
+// Draw a horizontal-gradient-filled rectangle
+fn void drawRectangleGradientH(int posX, int posY, int width, int height, Color color1, Color color2) @extname("DrawRectangleGradientH");
+// Draw a gradient-filled rectangle with custom vertex colors
+fn void drawRectangleGradientEx(Rectangle rec, Color col1, Color col2, Color col3, Color col4) @extname("DrawRectangleGradientEx");
+// Draw rectangle outline
+fn void drawRectangleLines(int posX, int posY, int width, int height, Color color) @extname("DrawRectangleLines");
+// Draw rectangle outline with extended parameters
+fn void drawRectangleLinesEx(Rectangle rec, float lineThick, Color color) @extname("DrawRectangleLinesEx");
+// Draw rectangle with rounded edges
+fn void drawRectangleRounded(Rectangle rec, float roundness, int segments, Color color) @extname("DrawRectangleRounded");
+// Draw rectangle with rounded edges outline
+fn void drawRectangleRoundedLines(Rectangle rec, float roundness, int segments, float lineThick, Color color) @extname("DrawRectangleRoundedLines");
+// Draw a color-filled triangle (vertex in counter-clockwise order!)
+fn void drawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color) @extname("DrawTriangle");
+// Draw triangle outline (vertex in counter-clockwise order!)
+fn void drawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color) @extname("DrawTriangleLines");
+// Draw a triangle fan defined by points (first vertex is the center)
+fn void drawTriangleFan(Vector2 *points, int pointCount, Color color) @extname("DrawTriangleFan");
+// Draw a triangle strip defined by points
+fn void drawTriangleStrip(Vector2 *points, int pointCount, Color color) @extname("DrawTriangleStrip");
+// Draw a regular polygon (Vector version)
+fn void drawPoly(Vector2 center, int sides, float radius, float rotation, Color color) @extname("DrawPoly");
+// Draw a polygon outline of n sides
+fn void drawPolyLines(Vector2 center, int sides, float radius, float rotation, Color color) @extname("DrawPolyLines");
+// Draw a polygon outline of n sides with extended parameters
+fn void drawPolyLinesEx(Vector2 center, int sides, float radius, float rotation, float lineThick, Color color) @extname("DrawPolyLinesEx");
+
+// Basic shapes collision detection functions
+// Check collision between two rectangles
+fn bool checkCollisionRecs(Rectangle rec1, Rectangle rec2) @extname("CheckCollisionRecs");
+// Check collision between two circles
+fn bool checkCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2) @extname("CheckCollisionCircles");
+// Check collision between circle and rectangle
+fn bool checkCollisionCircleRec(Vector2 center, float radius, Rectangle rec) @extname("CheckCollisionCircleRec");
+// Check if point is inside rectangle
+fn bool checkCollisionPointRec(Vector2 point, Rectangle rec) @extname("CheckCollisionPointRec");
+// Check if point is inside circle
+fn bool checkCollisionPointCircle(Vector2 point, Vector2 center, float radius) @extname("CheckCollisionPointCircle");
+// Check if point is inside a triangle
+fn bool checkCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3) @extname("CheckCollisionPointTriangle");
+// Check the collision between two lines defined by two points each, returns collision point by reference
+// Check if point is within a polygon described by array of vertices
+fn bool checkCollisionPointPoly(Vector2 point, Vector2 *points, int pointCount) @extname("CheckCollisionPointPoly");
+fn bool checkCollisionLines(Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint) @extname("CheckCollisionLines");
+// Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+fn bool checkCollisionPointLine(Vector2 point, Vector2 p1, Vector2 p2, int threshold) @extname("CheckCollisionPointLine");
+// Get collision rectangle for two rectangles collision
+fn Rectangle getCollisionRec(Rectangle rec1, Rectangle rec2) @extname("GetCollisionRec");                                         
+
+//------------------------------------------------------------------------------------
+// Texture Loading and Drawing Functions (Module: textures)
+//------------------------------------------------------------------------------------
+
+// Image loading functions
+// NOTE: This functions do not require GPU access
+// Load image from file into CPU memory (RAM)
+fn Image loadImage(char* fileName) @extname("LoadImage");
+// Load image from RAW file data
+fn Image loadImageRaw(char* fileName, int width, int height, int format, int headerSize) @extname("LoadImageRaw");
+// Load image sequence from file (frames appended to image.data)
+fn Image loadImageAnim(char* fileName, int *frames) @extname("LoadImageAnim");
+// Load image from memory buffer, fileType refers to extension: i.e. '.png'
+fn Image loadImageFromMemory(char* fileType, char* fileData, int dataSize) @extname("LoadImageFromMemory");
+// Load image from GPU texture data
+fn Image loadImageFromTexture(Texture2D texture) @extname("LoadImageFromTexture");
+// Load image from screen buffer and (screenshot)
+fn Image loadImageFromScreen() @extname("LoadImageFromScreen");
+// Unload image from CPU memory (RAM)
+fn void unloadImage(Image image) @extname("UnloadImage");
+// Export image data to file, returns true on success
+fn bool exportImage(Image image, char* fileName) @extname("ExportImage");
+// Export image as code file defining an array of bytes, returns true on success
+fn bool exportImageAsCode(Image image, char* fileName) @extname("ExportImageAsCode");
+
+// Image generation functions
+// Generate image: plain color
+fn Image genImageColor(int width, int height, Color color) @extname("GenImageColor");
+// Generate image: vertical gradient
+fn Image genImageGradientV(int width, int height, Color top, Color bottom) @extname("GenImageGradientV");
+// Generate image: horizontal gradient
+fn Image genImageGradientH(int width, int height, Color left, Color right) @extname("GenImageGradientH");
+// Generate image: radial gradient
+fn Image genImageGradientRadial(int width, int height, float density, Color inner, Color outer) @extname("GenImageGradientRadial");
+// Generate image: checked
+fn Image genImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2) @extname("GenImageChecked");
+// Generate image: white noise
+fn Image genImageWhiteNoise(int width, int height, float factor) @extname("GenImageWhiteNoise");
+// Generate image: perlin noise
+fn Image genImagePerlinNoise(int width, int height, int offsetX, int offsetY, float scale) @extname("GenImagePerlinNoise");
+// Generate image: cellular algorithm, bigger tileSize means bigger cells
+fn Image genImageCellular(int width, int height, int tileSize) @extname("GenImageCellular");
+
+// Image manipulation functions
+// Create an image duplicate (useful for transformations)
+fn Image imageCopy(Image image) @extname("ImageCopy");
+// Create an image from another image piece
+fn Image imageFromImage(Image image, Rectangle rec) @extname("ImageFromImage");
+// Create an image from text (default font)
+fn Image imageText(char* text, int fontSize, Color color) @extname("ImageText");
+// Create an image from text (custom sprite font)
+fn Image imageTextEx(Font font, char* text, float fontSize, float spacing, Color tint) @extname("ImageTextEx");
+// Convert image data to desired format
+fn void imageFormat(Image *image, PixelFormat newFormat) @extname("ImageFormat");
+// Convert image to POT (power-of-two)
+fn void imageToPOT(Image *image, Color fill) @extname("ImageToPOT");
+// Crop an image to a defined rectangle
+fn void imageCrop(Image *image, Rectangle crop) @extname("ImageCrop");
+// Crop image depending on alpha value
+fn void imageAlphaCrop(Image *image, float threshold) @extname("ImageAlphaCrop");
+// Clear alpha channel to desired color
+fn void imageAlphaClear(Image *image, Color color, float threshold) @extname("ImageAlphaClear");
+// Apply alpha mask to image
+fn void imageAlphaMask(Image *image, Image alphaMask) @extname("ImageAlphaMask");
+// Premultiply alpha channel
+fn void imageAlphaPremultiply(Image *image) @extname("ImageAlphaPremultiply");
+// Resize image (Bicubic scaling algorithm)
+fn void imageResize(Image *image, int newWidth, int newHeight) @extname("ImageResize");
+// Resize image (Nearest-Neighbor scaling algorithm)
+fn void imageResizeNN(Image *image, int newWidth,int newHeight) @extname("ImageResizeNN");
+// Resize canvas and fill with color
+fn void imageResizeCanvas(Image *image, int newWidth, int newHeight, int offsetX, int offsetY, Color fill) @extname("ImageResizeCanvas");
+// Compute all mipmap levels for a provided image
+fn void imageMipmaps(Image *image) @extname("ImageMipmaps");
+// Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
+fn void imageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp) @extname("ImageDither");
+// Flip image vertically
+fn void imageFlipVertical(Image *image) @extname("ImageFlipVertical");
+// Flip image horizontally
+fn void imageFlipHorizontal(Image *image) @extname("ImageFlipHorizontal");
+// Rotate image clockwise 90deg
+fn void imageRotateCW(Image *image) @extname("ImageRotateCW");
+// Rotate image counter-clockwise 90deg
+fn void imageRotateCCW(Image *image) @extname("ImageRotateCCW");
+// Modify image color: tint
+fn void imageColorTint(Image *image, Color color) @extname("ImageColorTint");
+// Modify image color: invert
+fn void imageColorInvert(Image *image) @extname("ImageColorInvert");
+// Modify image color: grayscale
+fn void imageColorGrayscale(Image *image) @extname("ImageColorGrayscale");
+// Modify image color: contrast (-100 to 100)
+fn void imageColorContrast(Image *image, float contrast) @extname("ImageColorContrast");
+// Modify image color: brightness (-255 to 255)
+fn void imageColorBrightness(Image *image, int brightness) @extname("ImageColorBrightness");
+// Modify image color: replace color
+fn void imageColorReplace(Image *image, Color color, Color replace) @extname("ImageColorReplace");
+// Load color data from image as a Color array (RGBA - 32bit)
+fn Color *loadImageColors(Image image) @extname("LoadImageColors");
+// Load colors palette from image as a Color array (RGBA - 32bit)
+fn Color *loadImagePalette(Image image, int maxPaletteSize, int *colorCount) @extname("LoadImagePalette");
+// Unload color data loaded with LoadImageColors()
+fn void unloadImageColors(Color *colors) @extname("UnloadImageColors");
+// Unload colors palette loaded with LoadImagePalette()
+fn void unloadImagePalette(Color *colors) @extname("UnloadImagePalette");
+// Get image alpha border rectangle
+fn Rectangle getImageAlphaBorder(Image image, float threshold) @extname("GetImageAlphaBorder");
+// Get image pixel color at (x, y) position
+fn Color getImageColor(Image image, int x, int y) @extname("GetImageColor");                                                    
+
+// Image drawing functions
+// NOTE: Image software-rendering functions (CPU)
+// Clear image background with given color
+fn void imageClearBackground(Image *dst, Color color) @extname("ImageClearBackground");
+// Draw pixel within an image
+fn void imageDrawPixel(Image *dst, int posX, int posY, Color color) @extname("ImageDrawPixel");
+// Draw pixel within an image (Vector version)
+fn void imageDrawPixelV(Image *dst, Vector2 position, Color color) @extname("ImageDrawPixelV");
+// Draw line within an image
+fn void imageDrawLine(Image *dst, int startPosX, int startPosY, int endPosX, int endPosY, Color color) @extname("ImageDrawLine");
+// Draw line within an image (Vector version)
+fn void imageDrawLineV(Image *dst, Vector2 start, Vector2 end, Color color) @extname("ImageDrawLineV");
+// Draw circle within an image
+fn void imageDrawCircle(Image *dst, int centerX, int centerY, int radius, Color color) @extname("ImageDrawCircle");
+// Draw circle within an image (Vector version)
+fn void imageDrawCircleV(Image *dst, Vector2 center, int radius, Color color) @extname("ImageDrawCircleV");
+// Draw circle outline within an image
+fn void imageDrawCircleLines(Image *dst, int centerX, int centerY, int radius, Color color) @extname("ImageDrawCircleLines");
+// Draw circle outline within an image (Vector version)
+fn void imageDrawCircleLinesV(Image *dst, Vector2 center, int radius, Color color) @extname("ImageDrawCircleLinesV");
+// Draw rectangle within an image
+fn void imageDrawRectangle(Image *dst, int posX, int posY, int width, int height, Color color) @extname("ImageDrawRectangle");
+// Draw rectangle within an image (Vector version)
+fn void imageDrawRectangleV(Image *dst, Vector2 position, Vector2 size, Color color) @extname("ImageDrawRectangleV");
+// Draw rectangle within an image
+fn void imageDrawRectangleRec(Image *dst, Rectangle rec, Color color) @extname("ImageDrawRectangleRec");
+// Draw rectangle lines within an image
+fn void imageDrawRectangleLines(Image *dst, Rectangle rec, int thick, Color color) @extname("ImageDrawRectangleLines");
+// Draw a source image within a destination image (tint applied to source)
+fn void imageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec, Color tint) @extname("ImageDraw");
+// Draw text (using default font) within an image (destination)
+fn void imageDrawText(Image *dst, char* text, int posX, int posY, int fontSize, Color color) @extname("ImageDrawText");
+// Draw text (custom sprite font) within an image (destination)
+fn void imageDrawTextEx(Image *dst, Font font, char* text, Vector2 position, float fontSize, float spacing, Color tint) @extname("ImageDrawTextEx");
+
+// Texture loading functions
+// NOTE: These functions require GPU access
+// Load texture from file into GPU memory (VRAM)
+fn Texture2D loadTexture(char* fileName) @extname("LoadTexture");
+// Load texture from image data
+fn Texture2D loadTextureFromImage(Image image) @extname("LoadTextureFromImage");
+// Load cubemap from image, multiple image cubemap layouts supported
+fn TextureCubemap loadTextureCubemap(Image image, int layout) @extname("LoadTextureCubemap");
+// Load texture for rendering (framebuffer)
+fn RenderTexture2D koadRenderTexture(int width, int height) @extname("LoadRenderTexture");
+// Unload texture from GPU memory (VRAM)
+fn void unloadTexture(Texture2D texture) @extname("UnloadTexture");
+// Unload render texture from GPU memory (VRAM)
+fn void unloadRenderTexture(RenderTexture2D target) @extname("UnloadRenderTexture");
+// Update GPU texture with new data
+fn void updateTexture(Texture2D texture, void* pixels) @extname("UpdateTexture");
+// Update GPU texture rectangle with new data
+fn void updateTextureRec(Texture2D texture, Rectangle rec, void* pixels) @extname("UpdateTextureRec");
+
+// Texture configuration functions
+// Generate GPU mipmaps for a texture
+fn void genTextureMipmaps(Texture2D *texture) @extname("GenTextureMipmaps");
+// Set texture scaling filter mode
+fn void setTextureFilter(Texture2D texture, TextureFilter filter) @extname("SetTextureFilter");
+// Set texture wrapping mode
+fn void setTextureWrap(Texture2D texture, int wrap) @extname("SetTextureWrap");
+
+// Texture drawing functions
+// Draw a Texture2D
+fn void drawTexture(Texture2D texture, int posX, int posY, Color tint) @extname("DrawTexture");
+// Draw a Texture2D with position defined as Vector2
+fn void drawTextureV(Texture2D texture, Vector2 position, Color tint) @extname("DrawTextureV");
+// Draw a Texture2D with extended parameters
+fn void drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) @extname("DrawTextureEx");
+// Draw a part of a texture defined by a rectangle
+fn void drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint) @extname("DrawTextureRec");
+// Draw texture quad with tiling and offset parameters
+fn void drawTextureQuad(Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint) @extname("DrawTextureRec");
+// Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
+fn void drawTextureTiled(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint) @extname("DrawTextureTiled");
+// Draw a part of a texture defined by a rectangle with 'pro' parameters
+fn void drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) @extname("DrawTexturePro");
+// Draws a texture (or part of it) that stretches or shrinks nicely
+fn void drawTextureNPatch(Texture2D texture, NPatchInfo nPatchInfo, Rectangle dest, Vector2 origin, float rotation, Color tint) @extname("DrawTextureNPatch");
+// Draw a textured polygon
+fn void drawTexturePoly(Texture2D texture, Vector2 center, Vector2 *points, Vector2 *texcoords, int pointCount, Color tint) @extname("DrawTexturePoly");
+
+// Color/pixel related functions
+// Get color with alpha applied, alpha goes from 0.0f to 1.0f
+fn Color fade(Color color, float alpha) @extname("Fade");
+// Get hexadecimal value for a Color
+fn int colorToInt(Color color) @extname("ColorToInt");
+// Get Color normalized as float [0..1]
+fn Vector4 colorNormalize(Color color) @extname("ColorNormalize");
+// Get Color from normalized values [0..1]
+fn Color colorFromNormalized(Vector4 normalized) @extname("ColorFromNormalized");
+// Get HSV values for a Color, hue [0..360], saturation/value [0..1]
+fn Vector3 colorToHSV(Color color) @extname("ColorToHSV");
+// Get a Color from HSV values, hue [0..360], saturation/value [0..1]
+fn Color colorFromHSV(float hue, float saturation, float value) @extname("ColorFromHSV");
+// Get color with alpha applied, alpha goes from 0.0f to 1.0f
+fn Color colorAlpha(Color color, float alpha) @extname("ColorAlpha");
+// Get src alpha-blended into dst color with tint
+fn Color colorAlphaBlend(Color dst, Color src, Color tint) @extname("ColorAlphaBlend");
+// Get Color structure from hexadecimal value
+fn Color getColor(uint hexValue) @extname("GetColor");
+// Get Color from a source pixel pointer of certain format
+fn Color getPixelColor(void* srcPtr, int format) @extname("GetPixelColor");
+// Set color formatted into destination pixel pointer
+fn void setPixelColor(void* dstPtr, Color color, PixelFormat format) @extname("SetPixelColor");
+// Get pixel data size in bytes for certain format
+fn int getPixelDataSize(int width, int height, PixelFormat format) @extname("GetPixelDataSize");
+
+//------------------------------------------------------------------------------------
+// Font Loading and Text Drawing Functions (Module: text)
+//------------------------------------------------------------------------------------
+
+// Font loading/unloading functions
+// Get the default Font
+fn Font getFontDefault() @extname("GetFontDefault");
+// Load font from file into GPU memory (VRAM)
+fn Font loadFont(char* fileName) @extname("LoadFont");
+// Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
+fn Font loadFontEx(char* fileName, int fontSize, int *fontChars, int glyphCount) @extname("LoadFontEx");
+// Load font from Image (XNA style)
+fn Font loadFontFromImage(Image image, Color key, int firstChar) @extname("LoadFontFromImage");
+// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+fn Font loadFontFromMemory(char* fileType, char* fileData, int dataSize, int fontSize, int *fontChars, int glyphCount) @extname("LoadFontFromMemory");
+// Load font data for further use
+fn GlyphInfo *loadFontData(char* fileData, int dataSize, int fontSize, int *fontChars, int glyphCount, int type) @extname("LoadFontData");
+// Generate image font atlas using chars info
+fn Image genImageFontAtlas(GlyphInfo *chars, Rectangle **recs, int glyphCount, int fontSize, int padding, int packMethod) @extname("GenImageFontAtlas");
+// Unload font chars info data (RAM)
+fn void unloadFontData(GlyphInfo *chars, int glyphCount) @extname("UnloadFontData");
+// Unload font from GPU memory (VRAM)
+fn void unloadFont(Font font) @extname("UnloadFont");
+// Export font as code file, returns true on success
+fn bool exportFontAsCode(Font font, char* fileName) @extname("ExportFontAsCode");
+
+
+// Text drawing functions
+// Draw current FPS
+fn void drawFPS(int posX, int posY) @extname("DrawFPS");
+// Draw text (using default font)
+fn void drawText(char* text, int posX, int posY, int fontSize, Color color) @extname("DrawText");
+// Draw text using font and additional parameters
+fn void drawTextEx(Font font, char* text, Vector2 position, float fontSize, float spacing, Color tint) @extname("DrawTextEx");
+// Draw text using Font and pro parameters (rotation)
+fn void drawTextPro(Font font, char* text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint) @extname("DrawTextPro");
+// Draw one character (codepoint)
+fn void drawTextCodepoint(Font font, int codepoint, Vector2 position, float fontSize, Color tint) @extname("DrawTextCodepoint");
+// Draw multiple character (codepoint)
+fn void drawTextCodepoints(Font font, int *codepoints, int count, Vector2 position, float fontSize, float spacing, Color tint) @extname("DrawTextCodepoints");
+
+// Text font info functions
+// Measure string width for default font
+fn int measureText(char* text, int fontSize) @extname("MeasureText");
+// Measure string size for Font
+fn Vector2 measureTextEx(Font font, char* text, float fontSize, float spacing) @extname("MeasureTextEx");
+// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
+fn int getGlyphIndex(Font font, int codepoint) @extname("GetGlyphIndex");
+// Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
+fn GlyphInfo getGlyphInfo(Font font, int codepoint) @extname("GetGlyphInfo");
+// Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
+fn Rectangle getGlyphAtlasRec(Font font, int codepoint) @extname("GetGlyphAtlasRec");
+
+// Text codepoints management functions (unicode characters)
+// Load UTF-8 text encoded from codepoints array
+fn char *loadUTF8(int *codepoints, int length) @extname("LoadUTF8");
+// Unload UTF-8 text encoded from codepoints array
+fn void unloadUTF8(char *text) @extname("UnloadUTF8");
+// Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+fn int *loadCodepoints(char* text, int *count) @extname("LoadCodepoints");
+// Unload codepoints data from memory
+fn void unloadCodepoints(int *codepoints) @extname("UnloadCodepoints");
+// Get total number of codepoints in a UTF-8 encoded string
+fn int getCodepointCount(char* text) @extname("GetCodepointCount");
+// Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+fn int getCodepoint(char* text, int *bytesProcessed) @extname("GetCodepoint");
+// Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+fn int getCodepointNext(char *text, int *codepointSize) @extname("GetCodepointNext");
+// Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+fn int getCodepointPrevious(char *text, int *codepointSize) @extname("GetCodepointPrevious");
+// Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+fn char* codepointToUTF8(int codepoint, int *byteSize) @extname("CodepointToUTF8");
+
+
+// Text strings management functions (no UTF-8 strings, only byte chars)
+// NOTE: Some strings allocate memory internally for returned strings, just be careful!
+// Copy one string to another, returns bytes copied
+fn int textCopy(char* dst, char* src) @extname("TextCopy");
+// Check if two text string are equal
+fn bool textIsEqual(char* text1, char* text2) @extname("TextIsEqual");
+// Get text length, checks for '\0' ending
+fn uint textLength(char* text) @extname("TextLength");
+// Text formatting with variables (sprintf() style)
+fn char* textFormat(char* text, ...) @extname("TextFormat");
+// Get a piece of a text string
+fn char* textSubtext(char* text, int position, int length) @extname("TextSubtext");
+// Replace text string (WARNING: memory must be freed!)
+fn char* textReplace(char* text, char* replace, char* by) @extname("TextReplace");
+// Insert text in a position (WARNING: memory must be freed!)
+fn char* textInsert(char* text, char* insert, int position) @extname("TextInsert");
+// Join text strings with delimiter
+fn char* textJoin(char* *textList, int count, char* delimiter) @extname("TextJoin");
+// Split text into multiple strings
+fn char* *textSplit(char* text, char delimiter, int *count) @extname("TextSplit");
+// Append text at specific position and move cursor!
+fn void textAppend(char* text, char* append, int *position) @extname("TextAppend");
+// Find first text occurrence within a string
+fn int textFindIndex(char* text, char* find) @extname("TextFindIndex");
+// Get upper case version of provided string
+fn char* textToUpper(char* text) @extname("TextToUpper");
+// Get lower case version of provided string
+fn char* textToLower(char* text) @extname("TextToLower");
+// Get Pascal case notation version of provided string
+fn char* textToPascal(char* text) @extname("TextToPascal");
+// Get integer value from text (negative values not supported)
+fn int textToInteger(char* text) @extname("TextToInteger");
+
+//------------------------------------------------------------------------------------
+// Basic 3d Shapes Drawing Functions (Module: models)
+//------------------------------------------------------------------------------------
+
+// Basic geometric 3D shapes drawing functions
+// Draw a line in 3D world space
+fn void drawLine3D(Vector3 startPos, Vector3 endPos, Color color) @extname("DrawLine3D");
+// Draw a point in 3D space, actually a small line
+fn void drawPoint3D(Vector3 position, Color color) @extname("DrawPoint3D");
+// Draw a circle in 3D world space
+fn void drawCircle3D(Vector3 center, float radius, Vector3 rotationAxis, float rotationAngle, Color color) @extname("DrawCircle3D");
+// Draw a color-filled triangle (vertex in counter-clockwise order!)
+fn void drawTriangle3D(Vector3 v1, Vector3 v2, Vector3 v3, Color color) @extname("DrawTriangle3D");
+// Draw a triangle strip defined by points
+fn void drawTriangleStrip3D(Vector3 *points, int pointCount, Color color) @extname("DrawTriangleStrip3D");
+// Draw cube
+fn void drawCube(Vector3 position, float width, float height, float length, Color color) @extname("DrawCube");
+// Draw cube (Vector version)
+fn void drawCubeV(Vector3 position, Vector3 size, Color color) @extname("DrawCubeV");
+// Draw cube wires
+fn void drawCubeWires(Vector3 position, float width, float height, float length, Color color) @extname("DrawCubeWires");
+// Draw cube wires (Vector version)
+fn void drawCubeWiresV(Vector3 position, Vector3 size, Color color) @extname("DrawCubeWiresV");
+// Draw cube textured
+fn void drawCubeTexture(Texture2D texture, Vector3 position, float width, float height, float length, Color color) @extname("DrawCubeTexture");
+// Draw cube with a region of a texture
+fn void drawCubeTextureRec(Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color) @extname("DrawCubeTextureRec");
+// Draw sphere
+fn void drawSphere(Vector3 centerPos, float radius, Color color) @extname("DrawSphere");
+// Draw sphere with extended parameters
+fn void drawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color) @extname("DrawSphereEx");
+// Draw sphere wires
+fn void drawSphereWires(Vector3 centerPos, float radius, int rings, int slices, Color color) @extname("DrawSphereWires");
+// Draw a cylinder/cone
+fn void drawCylinder(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color) @extname("DrawCylinder");
+// Draw a cylinder with base at startPos and top at endPos
+fn void drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color) @extname("DrawCylinderEx");
+// Draw a cylinder/cone wires
+fn void drawCylinderWires(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color) @extname("DrawCylinderWires");
+// Draw a cylinder wires with base at startPos and top at endPos
+fn void drawCylinderWiresEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color) @extname("DrawCylinderWiresEx");
+// Draw a plane XZ
+fn void drawPlane(Vector3 centerPos, Vector2 size, Color color) @extname("DrawPlane");
+// Draw a ray line
+fn void drawRay(Ray ray, Color color) @extname("DrawRay");
+// Draw a grid (centered at (0, 0, 0))
+fn void drawGrid(int slices, float spacing) @extname("DrawGrid");
+
+//------------------------------------------------------------------------------------
+// Model 3d Loading and Drawing Functions (Module: models)
+//------------------------------------------------------------------------------------
+
+// Model management functions
+// Load model from files (meshes and materials)
+fn Model loadModel(char* fileName) @extname("LoadModel");
+// Load model from generated mesh (default material)
+fn Model loadModelFromMesh(Mesh mesh) @extname("LoadModelFromMesh");
+// Unload model (including meshes) from memory (RAM and/or VRAM)
+fn void unloadModel(Model model) @extname("UnloadModel");
+// Unload model (but not meshes) from memory (RAM and/or VRAM)
+fn void unloadModelKeepMeshes(Model model) @extname("UnloadModelKeepMeshes");
+// Compute model bounding box limits (considers all meshes)
+fn BoundingBox getModelBoundingBox(Model model) @extname("GetModelBoundingBox");
+
+// Model drawing functions
+// Draw a model (with texture if set)
+fn void drawModel(Model model, Vector3 position, float scale, Color tint) @extname("DrawModel");
+// Draw a model with extended parameters
+fn void drawModelEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) @extname("DrawModelEx");
+// Draw a model wires (with texture if set)
+fn void drawModelWires(Model model, Vector3 position, float scale, Color tint) @extname("DrawModelWires");
+// Draw a model wires (with texture if set) with extended parameters
+fn void drawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint) @extname("DrawModelWiresEx");
+// Draw bounding box (wires)
+fn void drawBoundingBox(BoundingBox box, Color color) @extname("DrawBoundingBox");
+// Draw a billboard texture
+fn void drawBillboard(Camera camera, Texture2D texture, Vector3 position, float size, Color tint) @extname("DrawBillboard");
+// Draw a billboard texture defined by source
+fn void drawBillboardRec(Camera camera, Texture2D texture, Rectangle source, Vector3 position, Vector2 size, Color tint) @extname("DrawBillboardRec");
+// Draw a billboard texture defined by source and rotation
+fn void drawBillboardPro(Camera camera, Texture2D texture, Rectangle source, Vector3 position, Vector3 up, Vector2 size, Vector2 origin, float rotation, Color tint) @extname("DrawBillboardPro");
+
+// Mesh management functions
+// Upload mesh vertex data in GPU and provide VAO/VBO ids
+fn void uploadMesh(Mesh *mesh, bool dynamic) @extname("UploadMesh");
+// Update mesh vertex data in GPU for a specific buffer index
+fn void updateMeshBuffer(Mesh mesh, int index, void* data, int dataSize, int offset) @extname("UpdateMeshBuffer");
+// Unload mesh data from CPU and GPU
+fn void unloadMesh(Mesh mesh) @extname("UnloadMesh");
+// Draw a 3d mesh with material and transform
+fn void drawMesh(Mesh mesh, Material material, Matrix transform) @extname("DrawMesh");
+// Draw multiple mesh instances with material and different transforms
+fn void drawMeshInstanced(Mesh mesh, Material material, Matrix *transforms, int instances) @extname("DrawMeshInstanced");
+// Export mesh data to file, returns true on success
+fn bool exportMesh(Mesh mesh, char* fileName) @extname("ExportMesh");
+// Compute mesh bounding box limits
+fn BoundingBox getMeshBoundingBox(Mesh mesh) @extname("GetMeshBoundingBox");
+// Compute mesh tangents
+fn void genMeshTangents(Mesh *mesh) @extname("GenMeshTangents");
+
+// Mesh generation functions
+// Generate polygonal mesh
+fn Mesh genMeshPoly(int sides, float radius) @extname("GenMeshPoly");
+// Generate plane mesh (with subdivisions)
+fn Mesh genMeshPlane(float width, float length, int resX, int resZ) @extname("GenMeshPlane");
+// Generate cuboid mesh
+fn Mesh genMeshCube(float width, float height, float length) @extname("GenMeshCube");
+// Generate sphere mesh (standard sphere)
+fn Mesh genMeshSphere(float radius, int rings, int slices) @extname("GenMeshSphere");
+// Generate half-sphere mesh (no bottom cap)
+fn Mesh genMeshHemiSphere(float radius, int rings, int slices) @extname("GenMeshHemiSphere");
+// Generate cylinder mesh
+fn Mesh genMeshCylinder(float radius, float height, int slices) @extname("GenMeshCylinder");
+// Generate cone/pyramid mesh
+fn Mesh genMeshCone(float radius, float height, int slices) @extname("GenMeshCone");
+// Generate torus mesh
+fn Mesh genMeshTorus(float radius, float size, int radSeg, int sides) @extname("GenMeshTorus");
+// Generate trefoil knot mesh
+fn Mesh genMeshKnot(float radius, float size, int radSeg, int sides) @extname("GenMeshKnot");
+// Generate heightmap mesh from image data
+fn Mesh genMeshHeightmap(Image heightmap, Vector3 size) @extname("GenMeshHeightmap");
+// Generate cubes-based map mesh from image data
+fn Mesh genMeshCubicmap(Image cubicmap, Vector3 cubeSize) @extname("GenMeshCubicmap");
+
+// Material loading/unloading functions
+// Load materials from model file
+fn Material *loadMaterials(char* fileName, int *materialCount) @extname("LoadMaterials");
+// Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
+fn Material loadMaterialDefault() @extname("LoadMaterialDefault");
+// Unload material from GPU memory (VRAM)
+fn void lnloadMaterial(Material material) @extname("UnloadMaterial");
+// Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
+fn void setMaterialTexture(Material *material, int mapType, Texture2D texture) @extname("SetMaterialTexture");
+// Set material for a mesh
+fn void setModelMeshMaterial(Model *model, int meshId, int materialId) @extname("SetModelMeshMaterial");
+
+// Model animations loading/unloading functions
+// Load model animations from file
+fn ModelAnimation *loadModelAnimations(char* fileName, uint *animCount) @extname("LoadModelAnimations");
+// Update model animation pose
+fn void updateModelAnimation(Model model, ModelAnimation anim, int frame) @extname("UpdateModelAnimation");
+// Unload animation data
+fn void unloadModelAnimation(ModelAnimation anim) @extname("UnloadModelAnimation");
+// Unload animation array data
+fn void unloadModelAnimations(ModelAnimation* animations, uint count) @extname("UnloadModelAnimations");
+// Check model animation skeleton match
+fn bool isModelAnimationValid(Model model, ModelAnimation anim) @extname("IsModelAnimationValid");
+
+// Collision detection functions
+// Check collision between two spheres
+fn bool checkCollisionSpheres(Vector3 center1, float radius1, Vector3 center2, float radius2) @extname("CheckCollisionSpheres");
+// Check collision between two bounding boxes
+fn bool checkCollisionBoxes(BoundingBox box1, BoundingBox box2) @extname("CheckCollisionBoxes");
+// Check collision between box and sphere
+fn bool checkCollisionBoxSphere(BoundingBox box, Vector3 center, float radius) @extname("CheckCollisionBoxSphere");
+// Get collision info between ray and sphere
+fn RayCollision getRayCollisionSphere(Ray ray, Vector3 center, float radius) @extname("GetRayCollisionSphere");
+// Get collision info between ray and box
+fn RayCollision getRayCollisionBox(Ray ray, BoundingBox box) @extname("GetRayCollisionBox");
+// Get collision info between ray and mesh
+fn RayCollision getRayCollisionMesh(Ray ray, Mesh mesh, Matrix transform) @extname("GetRayCollisionMesh");
+// Get collision info between ray and triangle
+fn RayCollision getRayCollisionTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3) @extname("GetRayCollisionTriangle");
+// Get collision info between ray and quad
+fn RayCollision getRayCollisionQuad(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4) @extname("GetRayCollisionQuad");
+
+//------------------------------------------------------------------------------------
+// Audio Loading and Playing Functions (Module: audio)
+//------------------------------------------------------------------------------------
+
+define AudioCallback = fn void(void* bufferdata, uint frames);
+
+// Audio device management functions
+// Initialize audio device and context
+fn void initAudioDevice() @extname("InitAudioDevice");
+// Close the audio device and context
+fn void closeAudioDevice() @extname("CloseAudioDevice");
+// Check if audio device has been initialized successfully
+fn bool isAudioDeviceReady() @extname("IsAudioDeviceReady");
+// Set master volume (listener)
+fn void setMasterVolume(float volume) @extname("SetMasterVolume");
+
+// Wave/Sound loading/unloading functions
+// Load wave data from file
+fn Wave loadWave(char* fileName) @extname("LoadWave");
+// Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+fn Wave loadWaveFromMemory(char* fileType, char* fileData, int dataSize) @extname("LoadWaveFromMemory");
+// Load sound from file
+fn Sound loadSound(char* fileName) @extname("LoadSound");
+// Load sound from wave data
+fn Sound loadSoundFromWave(Wave wave) @extname("LoadSoundFromWave");
+// Update sound buffer with new data
+fn void updateSound(Sound sound, void* data, int sampleCount) @extname("UpdateSound");
+// Unload wave data
+fn void unloadWave(Wave wave) @extname("UnloadWave");
+// Unload sound
+fn void unloadSound(Sound sound) @extname("UnloadSound");
+// Export wave data to file, returns true on success
+fn bool exportWave(Wave wave, char* fileName) @extname("ExportWave");
+// Export wave sample data to code (.h), returns true on success
+fn bool exportWaveAsCode(Wave wave, char* fileName) @extname("ExportWaveAsCode");
+
+// Wave/Sound management functions
+// Play a sound
+fn void playSound(Sound sound) @extname("PlaySound");
+// Stop playing a sound
+fn void stopSound(Sound sound) @extname("StopSound");
+// Pause a sound
+fn void pauseSound(Sound sound) @extname("PauseSound");
+// Resume a paused sound
+fn void resumeSound(Sound sound) @extname("ResumeSound");
+// Play a sound (using multichannel buffer pool)
+fn void playSoundMulti(Sound sound) @extname("PlaySoundMulti");
+// Stop any sound playing (using multichannel buffer pool)
+fn void stopSoundMulti() @extname("StopSoundMulti");
+// Get number of sounds playing in the multichannel
+fn int getSoundsPlaying() @extname("GetSoundsPlaying");
+// Check if a sound is currently playing
+fn bool isSoundPlaying(Sound sound) @extname("IsSoundPlaying");
+// Set volume for a sound (1.0 is max level)
+fn void setSoundVolume(Sound sound, float volume) @extname("SetSoundVolume");
+// Set pitch for a sound (1.0 is base level)
+fn void setSoundPitch(Sound sound, float pitch) @extname("SetSoundPitch");
+// Set pan for a sound (0.5 is center)
+fn void setSoundPan(Sound sound, float pan) @extname("SetSoundPan");
+// Copy a wave to a new wave
+fn Wave waveCopy(Wave wave) @extname("WaveCopy");
+// Crop a wave to defined samples range
+fn void waveCrop(Wave *wave, int initSample, int finalSample) @extname("WaveCrop");
+// Convert wave data to desired format
+fn void waveFormat(Wave *wave, int sampleRate, int sampleSize, int channels) @extname("WaveFormat");
+// Load samples data from wave as a 32bit float data array
+fn float *loadWaveSamples(Wave wave) @extname("LoadWaveSamples");
+// Unload samples data loaded with LoadWaveSamples()
+fn void unloadWaveSamples(float *samples) @extname("UnloadWaveSamples");
+
+// Music management functions
+// Load music stream from file
+fn Music loadMusicStream(char* fileName) @extname("LoadMusicStream");
+// Load music stream from data
+fn Music loadMusicStreamFromMemory(char* fileType, char* data, int dataSize) @extname("LoadMusicStreamFromMemory");
+// Unload music stream
+fn void unloadMusicStream(Music music) @extname("UnloadMusicStream");
+// Start music playing
+fn void playMusicStream(Music music) @extname("PlayMusicStream");
+// Check if music is playing
+fn bool isMusicStreamPlaying(Music music) @extname("IsMusicStreamPlaying");
+// Updates buffers for music streaming
+fn void updateMusicStream(Music music) @extname("UpdateMusicStream");
+// Stop music playing
+fn void stopMusicStream(Music music) @extname("StopMusicStream");
+// Pause music playing
+fn void pauseMusicStream(Music music) @extname("PauseMusicStream");
+// Resume playing paused music
+fn void resumeMusicStream(Music music) @extname("ResumeMusicStream");
+// Seek music to a position (in seconds)
+fn void seekMusicStream(Music music, float position) @extname("SeekMusicStream");
+// Set volume for music (1.0 is max level)
+fn void setMusicVolume(Music music, float volume) @extname("SetMusicVolume");
+// Set pitch for a music (1.0 is base level)
+fn void setMusicPitch(Music music, float pitch) @extname("SetMusicPitch");
+// Set pan for a music (0.5 is center)
+fn void setMusicPan(Music music, float pan) @extname("SetMusicPan");
+// Get music time length (in seconds)
+fn float getMusicTimeLength(Music music) @extname("GetMusicTimeLength");
+// Get current music time played (in seconds)
+fn float getMusicTimePlayed(Music music) @extname("GetMusicTimePlayed");
+
+// AudioStream management functions
+// Load audio stream (to stream raw audio pcm data)
+fn AudioStream loadAudioStream(uint sampleRate, uint sampleSize, uint channels) @extname("LoadAudioStream");
+// Unload audio stream and free memory
+fn void unloadAudioStream(AudioStream stream) @extname("UnloadAudioStream");
+// Update audio stream buffers with data
+fn void updateAudioStream(AudioStream stream, void* data, int frameCount) @extname("UpdateAudioStream");
+// Check if any audio stream buffers requires refill
+fn bool isAudioStreamProcessed(AudioStream stream) @extname("IsAudioStreamProcessed");
+// Play audio stream
+fn void playAudioStream(AudioStream stream) @extname("PlayAudioStream");
+// Pause audio stream
+fn void pauseAudioStream(AudioStream stream) @extname("PauseAudioStream");
+// Resume audio stream
+fn void resumeAudioStream(AudioStream stream) @extname("ResumeAudioStream");
+// Check if audio stream is playing
+fn bool isAudioStreamPlaying(AudioStream stream) @extname("IsAudioStreamPlaying");
+// Stop audio stream
+fn void stopAudioStream(AudioStream stream) @extname("StopAudioStream");
+// Set volume for audio stream (1.0 is max level)
+fn void setAudioStreamVolume(AudioStream stream, float volume) @extname("SetAudioStreamVolume");
+// Set pitch for audio stream (1.0 is base level)
+fn void setAudioStreamPitch(AudioStream stream, float pitch) @extname("SetAudioStreamPitch");
+// Set pan for audio stream (0.5 is centered)
+fn void setAudioStreamPan(AudioStream stream, float pan) @extname("SetAudioStreamPan");
+// Default size for new audio streams
+fn void setAudioStreamBufferSizeDefault(int size) @extname("SetAudioStreamBufferSizeDefault");
+// Audio thread callback to request new data
+fn void setAudioStreamCallback(AudioStream stream, AudioCallback processor) @extname("SetAudioStreamCallback");
+
+// Attach audio stream processor to stream
+fn void attachAudioStreamProcessor(AudioStream stream, AudioCallback processor) @extname("AttachAudioStreamProcessor");
+// Detach audio stream processor from stream
+fn void detachAudioStreamProcessor(AudioStream stream, AudioCallback processor) @extname("DetachAudioStreamProcessor");
+
+module rl::config;
+
+//----------------------------------------------------------------------------------
+// Enumerators Definition
+//----------------------------------------------------------------------------------
+// System/Window config flags
+// NOTE: Every bit registers one state (use it with bit masks)
+// By default all flags are set to 0
+
+define ConfigFlag = distinct uint;
+
+const ConfigFlag VSYNC_HINT         = 0x00000040;   // Set to try enabling V-Sync on GPU
+const ConfigFlag FULLSCREEN_MODE    = 0x00000002;   // Set to run program in fullscreen
+const ConfigFlag WINDOW_RESIZABLE   = 0x00000004;   // Set to allow resizable window
+const ConfigFlag WINDOW_UNDECORATED = 0x00000008;   // Set to disable window decoration (frame and buttons)
+const ConfigFlag WINDOW_HIDDEN      = 0x00000080;   // Set to hide window
+const ConfigFlag WINDOW_MINIMIZED   = 0x00000200;   // Set to minimize window (iconify)
+const ConfigFlag WINDOW_MAXIMIZED   = 0x00000400;   // Set to maximize window (expanded to monitor)
+const ConfigFlag WINDOW_UNFOCUSED   = 0x00000800;   // Set to window non focused
+const ConfigFlag WINDOW_TOPMOST     = 0x00001000;   // Set to window always on top
+const ConfigFlag WINDOW_ALWAYS_RUN  = 0x00000100;   // Set to allow windows running while minimized
+const ConfigFlag WINDOW_TRANSPARENT = 0x00000010;   // Set to allow transparent framebuffer
+const ConfigFlag WINDOW_HIGHDPI     = 0x00002000;   // Set to support HighDPI
+const ConfigFlag MSAA_4X_HINT       = 0x00000020;   // Set to try enabling MSAA 4X
+const ConfigFlag INTERLACED_HINT    = 0x00010000;   // Set to try enabling interlaced video format (for V3D)
+
+module rl::keyboard;
+
+// Keyboard keys (US keyboard layout)
+// NOTE: Use GetKeyPressed() to allow redefining
+// required keys for alternative layouts
+
+define KeyboardKey = distinct int;
+
+const KeyboardKey NULL            = 0;        // Key: NULL; used for no key pressed
+// Alphanumeric keys
+const KeyboardKey APOSTROPHE      = 39;       // Key: '
+const KeyboardKey COMMA           = 44;       // Key: ;
+const KeyboardKey MINUS           = 45;       // Key: -
+const KeyboardKey PERIOD          = 46;       // Key: .
+const KeyboardKey SLASH           = 47;       // Key: /
+const KeyboardKey ZERO            = 48;       // Key: 0
+const KeyboardKey ONE             = 49;       // Key: 1
+const KeyboardKey TWO             = 50;       // Key: 2
+const KeyboardKey THREE           = 51;       // Key: 3
+const KeyboardKey FOUR            = 52;       // Key: 4
+const KeyboardKey FIVE            = 53;       // Key: 5
+const KeyboardKey SIX             = 54;       // Key: 6
+const KeyboardKey SEVEN           = 55;       // Key: 7
+const KeyboardKey EIGHT           = 56;       // Key: 8
+const KeyboardKey NINE            = 57;       // Key: 9
+const KeyboardKey SEMICOLON       = 59;       // Key: ;
+const KeyboardKey EQUAL           = 61;       // Key: =
+const KeyboardKey A               = 65;       // Key: A | a
+const KeyboardKey B               = 66;       // Key: B | b
+const KeyboardKey C               = 67;       // Key: C | c
+const KeyboardKey D               = 68;       // Key: D | d
+const KeyboardKey E               = 69;       // Key: E | e
+const KeyboardKey F               = 70;       // Key: F | f
+const KeyboardKey G               = 71;       // Key: G | g
+const KeyboardKey H               = 72;       // Key: H | h
+const KeyboardKey I               = 73;       // Key: I | i
+const KeyboardKey J               = 74;       // Key: J | j
+const KeyboardKey K               = 75;       // Key: K | k
+const KeyboardKey L               = 76;       // Key: L | l
+const KeyboardKey M               = 77;       // Key: M | m
+const KeyboardKey N               = 78;       // Key: N | n
+const KeyboardKey O               = 79;       // Key: O | o
+const KeyboardKey P               = 80;       // Key: P | p
+const KeyboardKey Q               = 81;       // Key: Q | q
+const KeyboardKey R               = 82;       // Key: R | r
+const KeyboardKey S               = 83;       // Key: S | s
+const KeyboardKey T               = 84;       // Key: T | t
+const KeyboardKey U               = 85;       // Key: U | u
+const KeyboardKey V               = 86;       // Key: V | v
+const KeyboardKey W               = 87;       // Key: W | w
+const KeyboardKey X               = 88;       // Key: X | x
+const KeyboardKey Y               = 89;       // Key: Y | y
+const KeyboardKey Z               = 90;       // Key: Z | z
+const KeyboardKey LEFT_BRACKET    = 91;       // Key: [
+const KeyboardKey BACKSLASH       = 92;       // Key: '\'
+const KeyboardKey RIGHT_BRACKET   = 93;       // Key: ]
+const KeyboardKey GRAVE           = 96;       // Key: `
+// Function keys
+const KeyboardKey SPACE           = 32;       // Key: Space
+const KeyboardKey ESCAPE          = 256;      // Key: Esc
+const KeyboardKey ENTER           = 257;      // Key: Enter
+const KeyboardKey TAB             = 258;      // Key: Tab
+const KeyboardKey BACKSPACE       = 259;      // Key: Backspace
+const KeyboardKey INSERT          = 260;      // Key: Ins
+const KeyboardKey DELETE          = 261;      // Key: Del
+const KeyboardKey RIGHT           = 262;      // Key: Cursor right
+const KeyboardKey LEFT            = 263;      // Key: Cursor left
+const KeyboardKey DOWN            = 264;      // Key: Cursor down
+const KeyboardKey UP              = 265;      // Key: Cursor up
+const KeyboardKey PAGE_UP         = 266;      // Key: Page up
+const KeyboardKey PAGE_DOWN       = 267;      // Key: Page down
+const KeyboardKey HOME            = 268;      // Key: Home
+const KeyboardKey END             = 269;      // Key: End
+const KeyboardKey CAPS_LOCK       = 280;      // Key: Caps lock
+const KeyboardKey SCROLL_LOCK     = 281;      // Key: Scroll down
+const KeyboardKey NUM_LOCK        = 282;      // Key: Num lock
+const KeyboardKey PRINT_SCREEN    = 283;      // Key: Print screen
+const KeyboardKey PAUSE           = 284;      // Key: Pause
+const KeyboardKey F1              = 290;      // Key: F1
+const KeyboardKey F2              = 291;      // Key: F2
+const KeyboardKey F3              = 292;      // Key: F3
+const KeyboardKey F4              = 293;      // Key: F4
+const KeyboardKey F5              = 294;      // Key: F5
+const KeyboardKey F6              = 295;      // Key: F6
+const KeyboardKey F7              = 296;      // Key: F7
+const KeyboardKey F8              = 297;      // Key: F8
+const KeyboardKey F9              = 298;      // Key: F9
+const KeyboardKey F10             = 299;      // Key: F10
+const KeyboardKey F11             = 300;      // Key: F11
+const KeyboardKey F12             = 301;      // Key: F12
+const KeyboardKey LEFT_SHIFT      = 340;      // Key: Shift left
+const KeyboardKey LEFT_CONTROL    = 341;      // Key: Control left
+const KeyboardKey LEFT_ALT        = 342;      // Key: Alt left
+const KeyboardKey LEFT_SUPER      = 343;      // Key: Super left
+const KeyboardKey RIGHT_SHIFT     = 344;      // Key: Shift right
+const KeyboardKey RIGHT_CONTROL   = 345;      // Key: Control right
+const KeyboardKey RIGHT_ALT       = 346;      // Key: Alt right
+const KeyboardKey RIGHT_SUPER     = 347;      // Key: Super right
+const KeyboardKey KB_MENU         = 348;      // Key: KB menu
+// Keypad keys
+const KeyboardKey KP_0            = 320;      // Key: Keypad 0
+const KeyboardKey KP_1            = 321;      // Key: Keypad 1
+const KeyboardKey KP_2            = 322;      // Key: Keypad 2
+const KeyboardKey KP_3            = 323;      // Key: Keypad 3
+const KeyboardKey KP_4            = 324;      // Key: Keypad 4
+const KeyboardKey KP_5            = 325;      // Key: Keypad 5
+const KeyboardKey KP_6            = 326;      // Key: Keypad 6
+const KeyboardKey KP_7            = 327;      // Key: Keypad 7
+const KeyboardKey KP_8            = 328;      // Key: Keypad 8
+const KeyboardKey KP_9            = 329;      // Key: Keypad 9
+const KeyboardKey KP_DECIMAL      = 330;      // Key: Keypad .
+const KeyboardKey KP_DIVIDE       = 331;      // Key: Keypad /
+const KeyboardKey KP_MULTIPLY     = 332;      // Key: Keypad *
+const KeyboardKey KP_SUBTRACT     = 333;      // Key: Keypad -
+const KeyboardKey KP_ADD          = 334;      // Key: Keypad +
+const KeyboardKey KP_ENTER        = 335;      // Key: Keypad Enter
+const KeyboardKey KP_EQUAL        = 336;      // Key: Keypad =
+// Android key buttons
+const KeyboardKey BACK            = 4;        // Key: Android back button
+const KeyboardKey MENU            = 82;       // Key: Android menu button
+const KeyboardKey VOLUME_UP       = 24;       // Key: Android volume up button
+const KeyboardKey VOLUME_DOWN     = 25;       // Key: Android volume down button
+
+module rl::gesture;
+
+define Gesture = distinct int;
+// Gesture
+// NOTE: It could be used as flags to enable only some gestures
+const Gesture NONE        = 0;      // No gesture
+const Gesture TAP         = 1;        // Tap gesture
+const Gesture DOUBLETAP   = 2;        // Double tap gesture
+const Gesture HOLD        = 4;        // Hold gesture
+const Gesture DRAG        = 8;        // Drag gesture
+const Gesture SWIPE_RIGHT = 16;       // Swipe right gesture
+const Gesture SWIPE_LEFT  = 32;       // Swipe left gesture
+const Gesture SWIPE_UP    = 64;       // Swipe up gesture
+const Gesture SWIPE_DOWN  = 128;      // Swipe down gesture
+const Gesture PINCH_IN    = 256;      // Pinch in gesture
+const Gesture PINCH_OUT   = 512;      // Pinch out gesture
+
