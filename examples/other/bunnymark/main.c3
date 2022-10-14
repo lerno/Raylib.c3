@@ -4,7 +4,7 @@ import std::io;
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 960;
 
-const int MAX_BUNNIES = 500000; // 50K bunnies limit
+const int MAX_BUNNIES = 50000; // 50K bunnies limit
 
 // This is the maximum amount of elements (quads) per batch
 // NOTE: This value is defined in [rlgl] module and can be changed there
