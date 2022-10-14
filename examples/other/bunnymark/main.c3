@@ -27,7 +27,7 @@ fn void main()
     Texture2D texBunny = rl::loadTexture("resources/wabbit_alpha.png");
     defer rl::unloadTexture(texBunny);
 
-    Bunny* bunnies = mem::malloc(MAX_BUNNIES * Bunny.sizeof);
+    Bunny[] bunnies = array::alloc(Bunny, MAX_BUNNIES);
     defer mem::free(bunnies);
 
     int bunniesCount = 0;
