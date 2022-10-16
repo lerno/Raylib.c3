@@ -1,1 +1,0 @@
-Select if you're using MSVC or MingW, extract it to windows-x64 and delete the other one! 
