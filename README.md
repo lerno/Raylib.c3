@@ -13,7 +13,7 @@
 ## Covered APIs
 - [X] raylib.h
 - [X] raymath.h
-- [ ] easings.h - Planned
+- [X] easings.h
 - [ ] raygui.h - Planned
 
 ## Installation - Using C3s build system
