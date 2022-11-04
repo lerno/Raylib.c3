@@ -14,7 +14,7 @@
 - [X] raylib.h
 - [X] raymath.h
 - [X] easings.h
-- [ ] raygui.h - Planned
+- [ ] raygui.h 
 
 ## Installation - Using C3s build system
 **1.** Create a C3 project. (instructions without project.c3p below)
