@@ -1,0 +1,3 @@
+[submodule "examples/Pong-C3"]
+	path = examples/Pong-C3
+	url = https://github.com/Its-Kenta/Pong-C3
