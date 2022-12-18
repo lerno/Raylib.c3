@@ -1,5 +1,4 @@
 module rl::easings;
-import libc;
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition - Utils math

@@ -1,5 +1,5 @@
 module rl::math;
-import libc;
+import std::math;
 //----------------------------------------------------------------------------------
 // Module Functions Definition - Utils math
 //----------------------------------------------------------------------------------
@@ -51,39 +51,40 @@ fn int floatEquals(float x, float y) @extname("FloatEquals");
 
 // Vector with components value 0.0f
 
-fn void Vector2.setZero(Vector2* v)
+fn Vector2 Vector2.setZero(Vector2* v)
 {
-    *v = {};
+   return *v = {};
 }
 
 // Vector with components value 1.0f
-fn void Vector2.setOne(Vector2* v)
+fn Vector2 Vector2.setOne(Vector2* v)
 {
-     *v = { 1.0f, 1.0f };
+   return *v = { 1.0f, 1.0f };
 }
 
 // Add two vectors (v1 + v2)
-fn void Vector2.add(Vector2* v1, Vector2 v2)
+fn Vector2 Vector2.add(Vector2* v1, Vector2 v2)
 {
-    *v1 = { v1.x + v2.x, v1.y + v2.y };
+    return *v1 = { v1.x + v2.x, v1.y + v2.y };
 }
 
+
 // Add vector and float value
-fn void Vector2.addValue(Vector2* v1, float add)
+fn Vector2 Vector2.addValue(Vector2* v1, float add)
 {
-    *v1 = { v1.x + add, v1.y + add };
+    return *v1 = { v1.x + add, v1.y + add };
 }
 
 // Subtract two vectors (v1 - v2)
-fn void Vector2.subtract(Vector2* v1, Vector2 v2)
+fn Vector2 Vector2.subtract(Vector2* v1, Vector2 v2, Vector2 v3)
 {
-    *v1 = { v1.x - v2.x, v1.y + v2.y };
+    return *v1 = { v2.x - v3.x, v2.y - v3.y };
 }
 
 // Subtract vector by float value
-fn void Vector2.subtractValue(Vector2* v1, float sub)
+fn Vector2 Vector2.subtractValue(Vector2* v1, float sub)
 {
-    *v1 = { v1.x - sub, v1.y - sub };
+   return *v1 = { v1.x - sub, v1.y - sub };
 }
 
 // Calculate vector length
@@ -129,37 +130,37 @@ fn float Vector2.distanceSqr(Vector2 v1, Vector2 v2)
  // Calculate angle from two vectors
 fn float Vector2.angle(Vector2 v1, Vector2 v2)
 {
-    float result = libc::atan2f(v2.y, v2.x) - libc::atan2f(v1.y, v1.x);
+    float result = math::atan2(v2.y, v2.x) - math::atan2(v1.y, v1.x);
 
     return result;
 }
 
 // Scale vector (multiply by value)
-fn void Vector2.scale(Vector2* v, float scale)
+fn Vector2 Vector2.scale(Vector2* v, float scale)
 {
-    *v = { v.x*scale, v.y*scale };
+    return *v = { v.x*scale, v.y*scale };
 }
 
 // Multiply vector by vector
-fn void Vector2.multiply(Vector2* v1, Vector2 v2)
+fn Vector2 Vector2.multiply(Vector2* v1, Vector2 v2)
 {
-    *v1 = { v1.x*v2.x, v1.y*v2.y };
+   return *v1 = { v1.x*v2.x, v1.y*v2.y };
 }
 
 // Negate vector
-fn void Vector2.negate(Vector2* v)
+fn Vector2 Vector2.negate(Vector2* v)
 {
-    *v = { -v.x, -v.y };
+   return *v = { -v.x, -v.y };
 }
 
 // Divide vector by vector
-fn void Vector2.divide(Vector2* v, Vector2 v2)
+fn Vector2 Vector2.divide(Vector2* v, Vector2 v2)
 {
-    *v = { v.x/v2.x, v.y/v2.y };
+   return *v = { v.x/v2.x, v.y/v2.y };
 }
 
 // Normalize provided vector
-fn void Vector2.normalize(Vector2* v)
+fn Vector2 Vector2.normalize(Vector2* v)
 {
     Vector2 result = {};
     float length = $$sqrt((v.x*v.x) + (v.y*v.y));
@@ -171,11 +172,11 @@ fn void Vector2.normalize(Vector2* v)
         result.y = v.y*ilength;
     }
 
-    *v = { result.x, result.y };
+   return *v = { result.x, result.y };
 }
 
 // Transforms a Vector2 by a given Matrix
-fn void Vector2.transform(Vector2* v, Matrix mat)
+fn Vector2 Vector2.transform(Vector2* v, Matrix mat)
 {
     Vector2 result = { };
 
@@ -186,22 +187,22 @@ fn void Vector2.transform(Vector2* v, Matrix mat)
     result.x = mat.m0*x + mat.m4*y + mat.m8*z + mat.m12;
     result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13;
 
-    *v = result;
+   return *v = result;
 }
 
 // Calculate linear interpolation between two vectors
-fn void Vector2.lerp(Vector2* v1, Vector2 v2, float amount)
+fn Vector2 Vector2.lerp(Vector2* v1, Vector2 v2, float amount)
 {
     Vector2 result = { };
 
     result.x = v1.x + amount*(v2.x - v1.x);
     result.y = v1.y + amount*(v2.y - v1.y);
 
-    *v1 = result;
+   return *v1 = result;
 }
 
 // Calculate reflected vector to normal
-fn void Vector2.reflect(Vector2* v1, Vector2 normal)
+fn Vector2 Vector2.reflect(Vector2* v1, Vector2 normal)
 {
     Vector2 result = { };
 
@@ -210,11 +211,11 @@ fn void Vector2.reflect(Vector2* v1, Vector2 normal)
     result.x = v1.x - (2.0f*normal.x)*dotProduct;
     result.y = v1.y - (2.0f*normal.y)*dotProduct;
 
-    *v1 = result;
+   return *v1 = result;
 }
 
 // Rotate vector by angle
-fn void Vector2.rotate(Vector2* v, float angle)
+fn Vector2 Vector2.rotate(Vector2* v, float angle)
 {
     Vector2 result = { };
 
@@ -224,7 +225,7 @@ fn void Vector2.rotate(Vector2* v, float angle)
     result.x = v.x*cosres - v.y*sinres;
     result.y = v.x*sinres + v.y*cosres;
 
-    *v = result;
+   return *v = result;
 }
 
 // Move Vector towards target
@@ -248,27 +249,27 @@ fn Vector2 Vector2.moveTowards(Vector2* v, Vector2 target, float maxDistance)
 }
 
 // Invert the given vector
-fn void Vector2.invert(Vector2* v)
+fn Vector2 Vector2.invert(Vector2* v)
 {
     Vector2 result = { 1.0f/v.x, 1.0f/v.y };
 
-    *v = result;
+   return *v = result;
 }
 
 // Clamp the components of the vector between
 // min and max values specified by the given vectors
-fn void Vector2.clamp(Vector2* v, Vector2 min, Vector2 max)
+fn Vector2 Vector2.clamp(Vector2* v, Vector2 min, Vector2 max)
 {
     Vector2 result = { };
 
     result.x = $$min(max.x, $$max(min.x, v.x));
     result.y = $$min(max.y, $$max(min.y, v.y));
 
-    *v = result;
+   return *v = result;
 }
 
 // Clamp the magnitude of the vector between two min and max values
-fn void Vector2.clampValue(Vector2* v, float min, float max)
+fn Vector2 Vector2.clampValue(Vector2* v, float min, float max)
 {
     Vector2 result = *v;
 
@@ -291,7 +292,7 @@ fn void Vector2.clampValue(Vector2* v, float min, float max)
         }
     }
 
-    *v = result;
+   return *v = result;
 }
 
 // Check whether two given vectors are almost equal
@@ -307,61 +308,61 @@ fn bool Vector2.equals(Vector2 p, Vector2 q)
 //----------------------------------------------------------------------------------
 
 // Vector with components value 0.0f
-fn void Vector3.setZero(Vector3* v)
+fn Vector3 Vector3.setZero(Vector3* v)
 {
-    *v = { 0.0f, 0.0f, 0.0f };
+   return *v = { 0.0f, 0.0f, 0.0f };
 }
 
 // Vector with components value 1.0f
-fn void Vector3.setOne(Vector3* v)
+fn Vector3 Vector3.setOne(Vector3* v)
 {
-    *v = { 1.0f, 1.0f, 1.0f };
+   return *v = { 1.0f, 1.0f, 1.0f };
 }
 
 // Add two vectors
-fn void Vector3.add(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.add(Vector3* v1, Vector3 v2)
 {
-    *v1 = { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
+   return *v1 = { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
 }
 
 // Add vector and float value
-fn void Vector3.addValue(Vector3* v, float add)
+fn Vector3 Vector3.addValue(Vector3* v, float add)
 {
-    *v = { v.x + add, v.y + add, v.z + add };
+   return *v = { v.x + add, v.y + add, v.z + add };
 }
 
 // Subtract two vectors
-fn void Vector3.subtract(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.subtract(Vector3* v1, Vector3 v2)
 {
-    *v1 = { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+   return *v1 = { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
 }
 
 // Subtract vector by float value
-fn void Vector3.subtractValue(Vector3* v, float sub)
+fn Vector3 Vector3.subtractValue(Vector3* v, float sub)
 {
-    *v = { v.x - sub, v.y - sub, v.z - sub };
+   return *v = { v.x - sub, v.y - sub, v.z - sub };
 }
 
 // Multiply vector by scalar
-fn void Vector3.scale(Vector3* v, float scalar)
+fn Vector3 Vector3.scale(Vector3* v, float scalar)
 {
-    *v = { v.x*scalar, v.y*scalar, v.z*scalar };
+   return *v = { v.x*scalar, v.y*scalar, v.z*scalar };
 }
 
 // Multiply vector by vector
-fn void Vector3.multiply(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.multiply(Vector3* v1, Vector3 v2)
 {
-    *v1 = { v1.x*v2.x, v1.y*v2.y, v1.z*v2.z };
+    return *v1 = { v1.x*v2.x, v1.y*v2.y, v1.z*v2.z };
 }
 
 // Calculate two vectors cross product
-fn void Vector3.crossProduct(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.crossProduct(Vector3* v1, Vector3 v2)
 {
-    *v1 = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x };
+   return *v1 = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x };
 }
 
 // Calculate one vector perpendicular vector
-fn void Vector3.perpendicular(Vector3* v)
+fn Vector3 Vector3.perpendicular(Vector3* v)
 {
     Vector3 result = { };
 
@@ -386,7 +387,7 @@ fn void Vector3.perpendicular(Vector3* v)
     result.y = v.z*cardinalAxis.x - v.x*cardinalAxis.z;
     result.z = v.x*cardinalAxis.y - v.y*cardinalAxis.x;
 
-    *v = result;
+   return *v = result;
 }
 
 // Calculate vector length
@@ -447,25 +448,25 @@ fn float Vector3.angle(Vector3 v1, Vector3 v2)
     Vector3 cross = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x };
     float len = $$sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z);
     float dot = (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
-    result = libc::atan2f(len, dot);
+    result = math::atan2(len, dot);
 
     return result;
 }
 
 // Negate provided vector (invert direction)
-fn void Vector3.negate(Vector3* v)
+fn Vector3 Vector3.negate(Vector3* v)
 {
-    *v = { -v.x, -v.y, -v.z };
+   return *v = { -v.x, -v.y, -v.z };
 }
 
 // Divide vector by vector
-fn void Vector3.divide(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.divide(Vector3* v1, Vector3 v2)
 {
-    *v1 = { v1.x/v2.x, v1.y/v2.y, v1.z/v2.z };
+    return *v1 = { v1.x/v2.x, v1.y/v2.y, v1.z/v2.z };
 }
 
 // Normalize provided vector
-fn void Vector3.normalize(Vector3* v)
+fn Vector3 Vector3.normalize(Vector3* v)
 {
     Vector3 result = *v;
 
@@ -477,7 +478,7 @@ fn void Vector3.normalize(Vector3* v)
     result.y *= ilength;
     result.z *= ilength;
 
-    *v = result;
+   return *v = result;
 }
 
 // Orthonormalize provided vectors
@@ -517,7 +518,7 @@ Vector3 vn1 = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v
 }
 
 // Transforms a Vector3 by a given Matrix
-fn void Vector3.transform(Vector3* v, Matrix mat)
+fn Vector3 Vector3.transform(Vector3* v, Matrix mat)
 {
     Vector3 result = { };
 
@@ -529,11 +530,11 @@ fn void Vector3.transform(Vector3* v, Matrix mat)
     result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13;
     result.z = mat.m2*x + mat.m6*y + mat.m10*z + mat.m14;
 
-    *v = result;
+   return *v = result;
 }
 
 // Transform a vector by quaternion rotation
-fn void Vector3.rotateByQuaternion(Vector3* v, Quaternion q)
+fn Vector3 Vector3.rotateByQuaternion(Vector3* v, Quaternion q)
 {
     Vector3 result = { };
 
@@ -541,11 +542,11 @@ fn void Vector3.rotateByQuaternion(Vector3* v, Quaternion q)
     result.y = v.x*(2*q.w*q.z + 2*q.x*q.y) + v.y*(q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z) + v.z*(-2*q.w*q.x + 2*q.y*q.z);
     result.z = v.x*(-2*q.w*q.y + 2*q.x*q.z) + v.y*(2*q.w*q.x + 2*q.y*q.z)+ v.z*(q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z);
 
-    *v = result;
+   return *v = result;
 }
 
 // Rotates a vector around an axis
-fn void Vector3.rotateByAxisAngle(Vector3* v, Vector3 axis, float angle)
+fn Vector3 Vector3.rotateByAxisAngle(Vector3* v, Vector3 axis, float angle)
 {
     // Using Euler-Rodrigues Formula
     // Ref.: https://en.wikipedia.org/w/index.php?title=Euler%E2%80%93Rodrigues_formula
@@ -593,11 +594,11 @@ fn void Vector3.rotateByAxisAngle(Vector3* v, Vector3 axis, float angle)
     result.y += wwv.y;
     result.z += wwv.z;
 
-    *v = result;
+   return *v = result;
 }
 
 // Calculate linear interpolation between two vectors
-fn void Vector3.lerp(Vector3* v1, Vector3 v2, float amount)
+fn Vector3 Vector3.lerp(Vector3* v1, Vector3 v2, float amount)
 {
     Vector3 result = { };
 
@@ -605,11 +606,11 @@ fn void Vector3.lerp(Vector3* v1, Vector3 v2, float amount)
     result.y = v1.y + amount*(v2.y - v1.y);
     result.z = v1.z + amount*(v2.z - v1.z);
 
-    *v1 = result;
+    return *v1 = result;
 }
 
 // Calculate reflected vector to normal
-fn void Vector3.reflect(Vector3* v, Vector3 normal)
+fn Vector3 Vector3.reflect(Vector3* v, Vector3 normal)
 {
     Vector3 result = { };
 
@@ -623,11 +624,11 @@ fn void Vector3.reflect(Vector3* v, Vector3 normal)
     result.y = v.y - (2.0f*normal.y)*dotProduct;
     result.z = v.z - (2.0f*normal.z)*dotProduct;
 
-    *v = result;
+   return *v = result;
 }
 
 // Get min value for each pair of components
-fn void Vector3.min(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.min(Vector3* v1, Vector3 v2)
 {
     Vector3 result = { };
 
@@ -635,11 +636,11 @@ fn void Vector3.min(Vector3* v1, Vector3 v2)
     result.y = $$min(v1.y, v2.y);
     result.z = $$min(v1.z, v2.z);
 
-    *v1 = result;
+   return *v1 = result;
 }
 
 // Get max value for each pair of components
-fn void Vector3.max(Vector3* v1, Vector3 v2)
+fn Vector3 Vector3.max(Vector3* v1, Vector3 v2)
 {
     Vector3 result = { };
 
@@ -647,12 +648,12 @@ fn void Vector3.max(Vector3* v1, Vector3 v2)
     result.y = $$max(v1.y, v2.y);
     result.z = $$max(v1.z, v2.z);
 
-    *v1 = result;
+   return *v1 = result;
 }
 
 // Compute barycenter coordinates (u, v, w) for point p with respect to triangle (a, b, c)
 // NOTE: Assumes P is on the plane of the triangle
-fn void Vector3.barycenter(Vector3* p, Vector3 a, Vector3 b, Vector3 c)
+fn Vector3 Vector3.barycenter(Vector3* p, Vector3 a, Vector3 b, Vector3 c)
 {
     Vector3 result = { };
 
@@ -671,12 +672,12 @@ fn void Vector3.barycenter(Vector3* p, Vector3 a, Vector3 b, Vector3 c)
     result.z = (d00*d21 - d01*d20)/denom;
     result.x = 1.0f - (result.z + result.y);
 
-    *p = result;
+   return *p = result;
 }
 
 // Projects a Vector3 from screen space into object space
 // NOTE: We are avoiding calling other raymath functions despite available
-fn void Vector3.unproject(Vector3* source, Matrix projection, Matrix view)
+fn Vector3 Vector3.unproject(Vector3* source, Matrix projection, Matrix view)
 {
     Vector3 result = { };
 
@@ -767,7 +768,7 @@ fn void Vector3.unproject(Vector3* source, Matrix projection, Matrix view)
     result.y = qtransformed.y/qtransformed.w;
     result.z = qtransformed.z/qtransformed.w;
 
-    *source = result;
+   return *source = result;
 }
 
 // Get Vector3 as float array
@@ -783,16 +784,16 @@ fn Float3 Vector3.toFloatV(Vector3* v)
 }
 
 // Invert the given vector
-fn void Vector3.invert(Vector3* v)
+fn Vector3 Vector3.invert(Vector3* v)
 {
     Vector3 result = { 1.0f/v.x, 1.0f/v.y, 1.0f/v.z };
 
-    *v = result;
+   return *v = result;
 }
 
 // Clamp the components of the vector between
 // min and max values specified by the given vectors
-fn void Vector3.clamp(Vector3* v, Vector3 min, Vector3 max)
+fn Vector3 Vector3.clamp(Vector3* v, Vector3 min, Vector3 max)
 {
     Vector3 result = { };
 
@@ -800,11 +801,11 @@ fn void Vector3.clamp(Vector3* v, Vector3 min, Vector3 max)
     result.y = $$min(max.y, $$max(min.y, v.y));
     result.z = $$min(max.z, $$max(min.z, v.z));
 
-    *v = result;
+   return *v = result;
 }
 
 // Clamp the magnitude of the vector between two values
-fn void Vector3.clampValue(Vector3* v, float min, float max)
+fn Vector3 Vector3.clampValue(Vector3* v, float min, float max)
 {
     Vector3 result = *v;
 
@@ -829,7 +830,7 @@ fn void Vector3.clampValue(Vector3* v, float min, float max)
         }
     }
 
-    *v = result;
+   return *v = result;
 }
 
 // Check whether two given vectors are almost equal
@@ -848,7 +849,7 @@ fn bool Vector3.equals(Vector3* p, Vector3 q)
 // and r specifies the ratio of the refractive index of the medium
 // from where the ray comes to the refractive index of the medium
 // on the other side of the surface
-fn void Vector3.refract(Vector3* v, Vector3 n, float r)
+fn Vector3 Vector3.refract(Vector3* v, Vector3 n, float r)
 {
     Vector3 result = { };
 
@@ -865,7 +866,7 @@ fn void Vector3.refract(Vector3* v, Vector3 n, float r)
         result = *v;
     }
 
-    *v = result;
+   return *v = result;
 }
 
 //----------------------------------------------------------------------------------
@@ -914,7 +915,7 @@ fn float Matrix.trace(Matrix mat)
 }
 
 // Transposes provided matrix
-fn void Matrix.transpose(Matrix* mat)
+fn Matrix Matrix.transpose(Matrix* mat)
 {
     Matrix result = { };
 
@@ -935,11 +936,11 @@ fn void Matrix.transpose(Matrix* mat)
     result.m14 = mat.m11;
     result.m15 = mat.m15;
 
-    *mat = result;
+    return *mat = result;
 }
 
 // Invert provided matrix
-fn void Matrix.invert(Matrix* mat)
+fn Matrix Matrix.invert(Matrix* mat)
 {
     Matrix result = { };
 
@@ -994,22 +995,22 @@ fn void Matrix.invert(Matrix* mat)
     result.m14 = (-a30*b03 + a31*b01 - a32*b00)*invDet;
     result.m15 = (a20*b03 - a21*b01 + a22*b00)*invDet;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get identity matrix
-fn void Matrix.identity(Matrix* mat)
+fn Matrix Matrix.identity(Matrix* mat)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
                       0.0f, 0.0f, 1.0f, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f };
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Add two matrices
-fn void Matrix.add(Matrix* left, Matrix right)
+fn Matrix Matrix.add(Matrix* left, Matrix right)
 {
     Matrix result = { };
 
@@ -1030,11 +1031,11 @@ fn void Matrix.add(Matrix* left, Matrix right)
     result.m14 = left.m14 + right.m14;
     result.m15 = left.m15 + right.m15;
 
-    *left = result;
+   return *left = result;
 }
 
 // Subtract two matrices (left - right)
-fn void Matrix.subtract(Matrix* left, Matrix right)
+fn Matrix Matrix.subtract(Matrix* left, Matrix right)
 {
     Matrix result = { };
 
@@ -1055,12 +1056,12 @@ fn void Matrix.subtract(Matrix* left, Matrix right)
     result.m14 = left.m14 - right.m14;
     result.m15 = left.m15 - right.m15;
 
-    *left = result;
+   return *left = result;
 }
 
 // Get two matrix multiplication
 // NOTE: When multiplying matrices... the order matters!
-fn void Matrix.multiply(Matrix* left, Matrix right)
+fn Matrix Matrix.multiply(Matrix* left, Matrix right)
 {
     Matrix result = { };
 
@@ -1081,23 +1082,23 @@ fn void Matrix.multiply(Matrix* left, Matrix right)
     result.m14 = left.m12*right.m2 + left.m13*right.m6 + left.m14*right.m10 + left.m15*right.m14;
     result.m15 = left.m12*right.m3 + left.m13*right.m7 + left.m14*right.m11 + left.m15*right.m15;
 
-    *left = result;
+   return *left = result;
 }
 
 // Get translation matrix
-fn void Matrix.translate(Matrix* mat, float x, float y, float z)
+fn Matrix Matrix.translate(Matrix* mat, float x, float y, float z)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, x,
                       0.0f, 1.0f, 0.0f, y,
                       0.0f, 0.0f, 1.0f, z,
                       0.0f, 0.0f, 0.0f, 1.0f };
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Create rotation matrix from axis and angle
 // NOTE: Angle should be provided in radians
-fn void Matrix.rotate(Matrix* mat, Vector3 axis, float angle)
+fn Matrix Matrix.rotate(Matrix* mat, Vector3 axis, float angle)
 {
     Matrix result = { };
 
@@ -1139,12 +1140,12 @@ fn void Matrix.rotate(Matrix* mat, Vector3 axis, float angle)
     result.m14 = 0.0f;
     result.m15 = 1.0f;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get x-rotation matrix
 // NOTE: Angle must be provided in radians
-fn void Matrix.rotateX(Matrix* mat, float angle)
+fn Matrix Matrix.rotateX(Matrix* mat, float angle)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
@@ -1159,12 +1160,12 @@ fn void Matrix.rotateX(Matrix* mat, float angle)
     result.m9 = -sinres;
     result.m10 = cosres;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get y-rotation matrix
 // NOTE: Angle must be provided in radians
-fn void Matrix.rotateY(Matrix* mat, float angle)
+fn Matrix Matrix.rotateY(Matrix* mat, float angle)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
@@ -1179,12 +1180,12 @@ fn void Matrix.rotateY(Matrix* mat, float angle)
     result.m8 = sinres;
     result.m10 = cosres;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get z-rotation matrix
 // NOTE: Angle must be provided in radians
-fn void Matrix.rotateZ(Matrix* mat, float angle)
+fn Matrix Matrix.rotateZ(Matrix* mat, float angle)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
@@ -1199,13 +1200,13 @@ fn void Matrix.rotateZ(Matrix* mat, float angle)
     result.m4 = -sinres;
     result.m5 = cosres;
 
-    *mat = result;
+   return *mat = result;
 }
 
 
 // Get xyz-rotation matrix
 // NOTE: Angle must be provided in radians
-fn void Matrix.rotateXYZ(Matrix* mat, Vector3 angle)
+fn Matrix Matrix.rotateXYZ(Matrix* mat, Vector3 angle)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
@@ -1231,12 +1232,12 @@ fn void Matrix.rotateXYZ(Matrix* mat, Vector3 angle)
     result.m9 = cosy*sinx;
     result.m10= cosy*cosx;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get zyx-rotation matrix
 // NOTE: Angle must be provided in radians
-fn void Matrix.rotateZYX(Matrix* mat, Vector3 angle)
+fn Matrix Matrix.rotateZYX(Matrix* mat, Vector3 angle)
 {
     Matrix result = { };
 
@@ -1267,22 +1268,22 @@ fn void Matrix.rotateZYX(Matrix* mat, Vector3 angle)
     result.m11 = 0;
     result.m15 = 1;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get scaling matrix
-fn void Matrix.scale(Matrix* mat, float x, float y, float z)
+fn Matrix Matrix.scale(Matrix* mat, float x, float y, float z)
 {
     Matrix result = { x, 0.0f, 0.0f, 0.0f,
                       0.0f, y, 0.0f, 0.0f,
                       0.0f, 0.0f, z, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f };
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get perspective projection matrix
-fn void Matrix.frustum(Matrix* mat, double left, double right, double bottom, double top, double near, double far)
+fn Matrix Matrix.frustum(Matrix* mat, double left, double right, double bottom, double top, double near, double far)
 {
     Matrix result = { };
 
@@ -1310,16 +1311,16 @@ fn void Matrix.frustum(Matrix* mat, double left, double right, double bottom, do
     result.m14 = -((float)far*(float)near*2.0f)/fnn;
     result.m15 = 0.0f;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get perspective projection matrix
 // NOTE: Fovy angle must be provided in radians
-fn void Matrix.perspective(Matrix* mat, double fovy, double aspect, double near, double far)
+fn Matrix Matrix.perspective(Matrix* mat, double fovy, double aspect, double near, double far)
 {
     Matrix result = { };
 
-    double top = near*libc::tan(fovy*0.5);
+    double top = near*math::tan(fovy*0.5);
     double bottom = -top;
     double right = top*aspect;
     double left = -right;
@@ -1337,11 +1338,11 @@ fn void Matrix.perspective(Matrix* mat, double fovy, double aspect, double near,
     result.m11 = -1.0f;
     result.m14 = -((float)far*(float)near*2.0f)/fnn;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get orthographic projection matrix
-fn void Matrix.ortho(Matrix* mat, double left, double right, double bottom, double top, double near, double far)
+fn Matrix Matrix.ortho(Matrix* mat, double left, double right, double bottom, double top, double near, double far)
 {
     Matrix result = { };
 
@@ -1366,11 +1367,11 @@ fn void Matrix.ortho(Matrix* mat, double left, double right, double bottom, doub
     result.m14 = -((float)far + (float)near)/fnn;
     result.m15 = 1.0f;
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get camera look-at matrix (view matrix)
-fn void Matrix.lookAt(Matrix* mat, Vector3 eye, Vector3 target, Vector3 up)
+fn Matrix Matrix.lookAt(Matrix* mat, Vector3 eye, Vector3 target, Vector3 up)
 {
     Matrix result = { };
 
@@ -1421,7 +1422,7 @@ fn void Matrix.lookAt(Matrix* mat, Vector3 eye, Vector3 target, Vector3 up)
     result.m14 = -(vz.x*eye.x + vz.y*eye.y + vz.z*eye.z);   // Vector3DotProduct(vz, eye)
     result.m15 = 1.0f;
 
-    *mat = result;
+    return *mat = result;
 }
 
 // Get float array of matrix data
@@ -1454,33 +1455,33 @@ fn Float16 Matrix.toFloatV(Matrix mat)
 //----------------------------------------------------------------------------------
 
 // Add two quaternions
-fn void Quaternion.add(Quaternion* q1, Quaternion q2)
+fn Quaternion Quaternion.add(Quaternion* q1, Quaternion q2)
 {
-    *q1 = {q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w};
+   return *q1 = {q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w};
 }
 
 // Add quaternion and float value
-fn void Quaternion.addValue(Quaternion* q1, float add)
+fn Quaternion Quaternion.addValue(Quaternion* q1, float add)
 {
-    *q1 = {q1.x + add, q1.y + add, q1.z + add, q1.w + add};
+   return *q1 = {q1.x + add, q1.y + add, q1.z + add, q1.w + add};
 }
 
 // Subtract two quaternions
-fn void Quaternion.subtract(Quaternion* q1, Quaternion q2)
+fn Quaternion Quaternion.subtract(Quaternion* q1, Quaternion q2)
 {
-    *q1 = {q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w};
+   return *q1 = {q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w};
 }
 
 // Subtract quaternion and float value
-fn void Quaternion.subtractValue(Quaternion* q, float sub)
+fn Quaternion Quaternion.subtractValue(Quaternion* q, float sub)
 {
-    *q = {q.x - sub, q.y - sub, q.z - sub, q.w - sub};
+   return *q = {q.x - sub, q.y - sub, q.z - sub, q.w - sub};
 }
 
 // Get identity quaternion
-fn void Quaternion.identity(Quaternion* q)
+fn Quaternion Quaternion.identity(Quaternion* q)
 {
-    *q = { 0.0f, 0.0f, 0.0f, 1.0f };
+   return *q = { 0.0f, 0.0f, 0.0f, 1.0f };
 }
 
 // Computes the length of a quaternion
@@ -1492,7 +1493,7 @@ fn float Quaternion.length(Quaternion q)
 }
 
 // Normalize provided quaternion
-fn void Quaternion.normalize(Quaternion* q)
+fn Quaternion Quaternion.normalize(Quaternion* q)
 {
     Quaternion result = {};
 
@@ -1505,11 +1506,11 @@ fn void Quaternion.normalize(Quaternion* q)
     result.z = q.z*ilength;
     result.w = q.w*ilength;
 
-    *q = result;
+   return *q = result;
 }
 
 // Invert provided quaternion
-fn void Quaternion.invert(Quaternion* q)
+fn Quaternion Quaternion.invert(Quaternion* q)
 {
     Quaternion result = *q;
 
@@ -1525,11 +1526,11 @@ fn void Quaternion.invert(Quaternion* q)
         result.w *= invLength;
     }
 
-    *q = result;
+   return *q = result;
 }
 
 // Calculate two quaternion multiplication
-fn void Quaternion.multiply(Quaternion* q1, Quaternion q2)
+fn Quaternion Quaternion.multiply(Quaternion* q1, Quaternion q2)
 {
     Quaternion result = { };
 
@@ -1547,11 +1548,11 @@ fn void Quaternion.multiply(Quaternion* q1, Quaternion q2)
     result.z = qaz*qbw + qaw*qbz + qax*qby - qay*qbx;
     result.w = qaw*qbw - qax*qbx - qay*qby - qaz*qbz;
 
-    *q1 = result;
+   return *q1 = result;
 }
 
 // Scale quaternion by float value
-fn void Quaternion.scale(Quaternion* q, float mul)
+fn Quaternion Quaternion.scale(Quaternion* q, float mul)
 {
     Quaternion result = { };
 
@@ -1560,17 +1561,17 @@ fn void Quaternion.scale(Quaternion* q, float mul)
     result.z = q.z*mul;
     result.w = q.w*mul;
 
-    *q = result;
+   return *q = result;
 }
 
 // Divide two quaternions
-fn void Quaternion.divide(Quaternion* q1, Quaternion q2)
+fn Quaternion Quaternion.divide(Quaternion* q1, Quaternion q2)
 {
-    *q1 = { q1.x/q2.x, q1.y/q2.y, q1.z/q2.z, q1.w/q2.w };
+   return *q1 = { q1.x/q2.x, q1.y/q2.y, q1.z/q2.z, q1.w/q2.w };
 }
 
 // Calculate linear interpolation between two quaternions
-fn void Quaternion.lerp(Quaternion* q1, Quaternion q2, float amount)
+fn Quaternion Quaternion.lerp(Quaternion* q1, Quaternion q2, float amount)
 {
     Quaternion result = { };
 
@@ -1579,11 +1580,11 @@ fn void Quaternion.lerp(Quaternion* q1, Quaternion q2, float amount)
     result.z = q1.z + amount*(q2.z - q1.z);
     result.w = q1.w + amount*(q2.w - q1.w);
 
-    *q1 = result;
+   return *q1 = result;
 }
 
 // Calculate slerp-optimized interpolation between two quaternions
-fn void Quaternion.nLerp(Quaternion* q1, Quaternion q2, float amount)
+fn Quaternion Quaternion.nLerp(Quaternion* q1, Quaternion q2, float amount)
 {
     Quaternion result = { };
 
@@ -1604,11 +1605,11 @@ fn void Quaternion.nLerp(Quaternion* q1, Quaternion q2, float amount)
     result.z = q.z*ilength;
     result.w = q.w*ilength;
 
-    *q1 = result;
+   return *q1 = result;
 }
 
 // Calculates spherical linear interpolation between two quaternions
-fn void Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
+fn Quaternion Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
 {
     Quaternion result = {};
 
@@ -1651,11 +1652,11 @@ fn void Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
         }
     }
 
-    *q1 = result;
+   return *q1 = result;
 }
 
 // Calculate quaternion based on the rotation from one vector to another
-fn void Quaternion.fromVector3ToVector3(Quaternion* q, Vector3 from, Vector3 to)
+fn Quaternion Quaternion.fromVector3ToVector3(Quaternion* q, Vector3 from, Vector3 to)
 {
     Quaternion result = { };
 
@@ -1679,11 +1680,11 @@ fn void Quaternion.fromVector3ToVector3(Quaternion* q, Vector3 from, Vector3 to)
     result.z = qr.z*ilength;
     result.w = qr.w*ilength;
 
-    *q = result;
+   return *q = result;
 }
 
 // Get a quaternion for a given rotation matrix
-fn void Quaternion.fromMatrix(Quaternion* q, Matrix mat)
+fn Quaternion Quaternion.fromMatrix(Quaternion* q, Matrix mat)
 {
     Quaternion result = { };
 
@@ -1743,11 +1744,11 @@ fn void Quaternion.fromMatrix(Quaternion* q, Matrix mat)
             break;
     }
 
-    *q = result;
+   return *q = result;
 }
 
 // Get a matrix for a given quaternion
-fn void Matrix.quaternionToMatrix(Matrix* mat, Quaternion q)
+fn Matrix Matrix.quaternionToMatrix(Matrix* mat, Quaternion q)
 {
     Matrix result = { 1.0f, 0.0f, 0.0f, 0.0f,
                       0.0f, 1.0f, 0.0f, 0.0f,
@@ -1776,12 +1777,12 @@ fn void Matrix.quaternionToMatrix(Matrix* mat, Quaternion q)
     result.m9 = 2*(bc - ad);
     result.m10 = 1 - 2*(a2 + b2);
 
-    *mat = result;
+   return *mat = result;
 }
 
 // Get rotation quaternion for an angle and axis
 // NOTE: Angle must be provided in radians
-fn void Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
+fn Quaternion Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
 {
     Quaternion result = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -1822,7 +1823,7 @@ fn void Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
         result.w = qr.w*ilength;
     }
 
-    *q = result;
+   return *q = result;
 }
 
 // Get the rotation angle and axis for a given quaternion
@@ -1864,7 +1865,7 @@ fn void Quaternion.toAxisAngle(Quaternion q, Vector3 *outAxis, float *outAngle)
 
 // Get the quaternion equivalent to Euler angles
 // NOTE: Rotation order is ZYX
-fn void Quaternion.fromEuler(Quaternion* q, float pitch, float yaw, float roll)
+fn Quaternion Quaternion.fromEuler(Quaternion* q, float pitch, float yaw, float roll)
 {
     Quaternion result = { };
 
@@ -1880,19 +1881,19 @@ fn void Quaternion.fromEuler(Quaternion* q, float pitch, float yaw, float roll)
     result.z = x0*y0*z1 - x1*y1*z0;
     result.w = x0*y0*z0 + x1*y1*z1;
 
-    *q = result;
+    return *q = result;
 }
 
 // Get the Euler angles equivalent to quaternion (roll, pitch, yaw)
 // NOTE: Angles are returned in a Vector3 struct in radians
-fn void Vector3.quaternionToEuler(Vector3* v, Quaternion q)
+fn Vector3 Vector3.quaternionToEuler(Vector3* v, Quaternion q)
 {
     Vector3 result = { };
 
     // Roll (x-axis rotation)
     float x0 = 2.0f*(q.w*q.x + q.y*q.z);
     float x1 = 1.0f - 2.0f*(q.x*q.x + q.y*q.y);
-    result.x = libc::atan2f(x0, x1);
+    result.x = math::atan2(x0, x1);
 
     // Pitch (y-axis rotation)
     float y0 = 2.0f*(q.w*q.y - q.z*q.x);
@@ -1903,13 +1904,13 @@ fn void Vector3.quaternionToEuler(Vector3* v, Quaternion q)
     // Yaw (z-axis rotation)
     float z0 = 2.0f*(q.w*q.z + q.x*q.y);
     float z1 = 1.0f - 2.0f*(q.y*q.y + q.z*q.z);
-    result.z = libc::atan2f(z0, z1);
+    result.z = math::atan2(z0, z1);
 
-    *v = result;
+   return *v = result;
 }
 
 // Transform a quaternion given a transformation matrix
-fn void Quaternion.transform(Quaternion* q, Matrix mat)
+fn Quaternion Quaternion.transform(Quaternion* q, Matrix mat)
 {
     Quaternion result = { };
 
@@ -1918,7 +1919,7 @@ fn void Quaternion.transform(Quaternion* q, Matrix mat)
     result.z = mat.m2*q.x + mat.m6*q.y + mat.m10*q.z + mat.m14*q.w;
     result.w = mat.m3*q.x + mat.m7*q.y + mat.m11*q.z + mat.m15*q.w;
 
-    *q = result;
+    return *q = result;
 }
 
 // Check whether two given quaternions are almost equal
