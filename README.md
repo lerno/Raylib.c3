@@ -28,7 +28,7 @@ https://github.com/Its-Kenta/Raylib-C3.git
 
 **4.** Add the compiled static library or use your system shared (make sure its added to path!) to the desired target inside the *raylib.c3l* folder. Please make sure it matches the binding version.
 
-**4.** Edit your *project.hson* file to include the library and the library directory as an example:
+**4.** Edit your *project.json* file to include the library and the library directory as an example:
 ```json
 {
   "langrev": "1",
