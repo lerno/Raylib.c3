@@ -388,29 +388,29 @@ enum TraceLogLevel : int
 // Mouse buttons
 enum MouseButton : int
 {
-    BUTTON_LEFT,       // Mouse button left
-    BUTTON_RIGHT,      // Mouse button right
-    BUTTON_MIDDLE,     // Mouse button middle (pressed wheel)
-    BUTTON_SIDE,       // Mouse button side (advanced mouse device)
-    BUTTON_EXTRA,      // Mouse button extra (advanced mouse device)
-    BUTTON_FORWARD,    // Mouse button fordward (advanced mouse device)
-    BUTTON_BACK,       // Mouse button back (advanced mouse device)
+    LEFT,       // Mouse button left
+    RIGHT,      // Mouse button right
+    MIDDLE,     // Mouse button middle (pressed wheel)
+    SIDE,       // Mouse button side (advanced mouse device)
+    EXTRA,      // Mouse button extra (advanced mouse device)
+    FORWARD,    // Mouse button fordward (advanced mouse device)
+    BACK,       // Mouse button back (advanced mouse device)
 } 
 
 // Mouse cursor
 enum MouseCursor : int
 {
-    CURSOR_DEFAULT,       // Default pointer shape
-    CURSOR_ARROW,         // Arrow shape
-    CURSOR_IBEAM,         // Text writing cursor shape
-    CURSOR_CROSSHAIR,     // Cross shape
-    CURSOR_POINTING_HAND, // Pointing hand cursor
-    CURSOR_RESIZE_EW,     // Horizontal resize/move arrow shape
-    CURSOR_RESIZE_NS,     // Vertical resize/move arrow shape
-    CURSOR_RESIZE_NWSE,   // Top-left to bottom-right diagonal resize/move arrow shape
-    CURSOR_RESIZE_NESW,   // The top-right to bottom-left diagonal resize/move arrow shape
-    CURSOR_RESIZE_ALL,    // The omni-directional resize/move cursor shape
-    CURSOR_NOT_ALLOWED    // The operation-not-allowed shape
+    DEFAULT,       // Default pointer shape
+    ARROW,         // Arrow shape
+    IBEAM,         // Text writing cursor shape
+    CROSSHAIR,     // Cross shape
+    POINTING_HAND, // Pointing hand cursor
+    RESIZE_EW,     // Horizontal resize/move arrow shape
+    RESIZE_NS,     // Vertical resize/move arrow shape
+    RESIZE_NWSE,   // Top-left to bottom-right diagonal resize/move arrow shape
+    RESIZE_NESW,   // The top-right to bottom-left diagonal resize/move arrow shape
+    RESIZE_ALL,    // The omni-directional resize/move cursor shape
+    NOT_ALLOWED    // The operation-not-allowed shape
 }
 
 $assert(MouseCursor.CURSOR_DEFAULT == 0);
