@@ -28,12 +28,23 @@ https://github.com/Its-Kenta/Raylib-C3.git
 
 **4.** Add the compiled static library or use your system shared (make sure its added to path!) to the desired target inside the *raylib.c3l* folder. Please make sure it matches the binding version.
 
-**4.** Edit your *project.c3p* file to include the library and the library directory as followed:
-```
-    // library directory
-  "libdir": ["lib"],
-    // libraries to use for all targets
-  "libs": [ "raylib" ],
+**4.** Edit your *project.json* file to include the library and the library directory as an example:
+```json
+{
+  "langrev": "1",
+  "warnings": [ "no-unused" ],
+  "dependency-search-paths": ["lib"],
+  "dependencies": [ "raylib" ],
+  "authors": [ "YOURNAMEHERE" ],
+  "version": "1.0",
+  "sources": [ "src/**" ],
+  "targets": {
+    "PROJECTNAMEHERE": {
+      "type": "executable"
+    }
+  }
+}
+
 ```
 
 **5.** Add the example code to your main.c3 in *src/YOURPROJECTNAME/main.c3*
