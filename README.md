@@ -91,11 +91,19 @@ https://github.com/Its-Kenta/Raylib-C3.git
 This command will compile and run the code and pass the library being imported with it's path.
 
 
-## Disclaimer
-This is the first binding I've made and made available to the public.
-I am aware that not everyone adheres to the same coding conventions and that this may not be to everyone's liking, but please feel free to submit your PRs so that we may make different branches to suit everyone!
+## Contributing
 
-Due to my lack of confidence in my abilities, I would also like to mention that there *might* be some code that does not function properly, not that I believe there is. Nevertheless, I hope you can help me improve by pointing out any potential mistakes I may have made. 
+1. Fork it (<https://github.com/your-github-user/Raylib-C3/fork>)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+If you plan to contribute please make sure you follow the same coding convention to match overall style of this binding (camelCases)
+
+## Contributors
+
+- [Kenta](https://github.com/Its-Kenta) - Creator and maintainer
 
 ## Credits
 Massive thank you to Christoffer L (C3 Creator) for his help on [C3 Discord community server](https://discord.gg/UWUTtUGJBT) and his vendor library template that Raylib-C3 grew from.
