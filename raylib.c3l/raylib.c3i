@@ -413,7 +413,7 @@ enum MouseCursor : int
     NOT_ALLOWED    // The operation-not-allowed shape
 }
 
-$assert(MouseCursor.CURSOR_DEFAULT == 0);
+$assert(MouseCursor.DEFAULT == 0);
 
 // Gamepad buttons
 enum GamepadButton : int 
