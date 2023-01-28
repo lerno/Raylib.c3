@@ -4,6 +4,9 @@ import std::math;
 // Module Functions Definition - Utils math
 //----------------------------------------------------------------------------------
 
+define Quaternion = rl::Quaternion;
+define Matrix = rl::Matrix;
+
 const float EPSILON = 0.000001f;
 
 // Get float vector for Matrix
@@ -28,22 +31,43 @@ struct Float16 {
 }
 
 // Clamp float value
-fn float clamp(float value, float min, float max) @extname("Clamp");
+// @ Use clamp function from std::math
+// fn float clamp(float value, float min, float max) {}
 
 // Calculate linear interpolation between two floats
-fn float lerp(float start, float end, float amount) @extname("Lerp");
+fn float lerp(float start, float end, float amount) {
+    float result = start + amount*(end - start);
+
+    return result;
+}
 
 // Normalize input value within input range
-fn float normalize(float value, float start, float end) @extname("Normalize");
+fn float normalize(float value, float start, float end) {
+    float result = (value - start)/(end - start);
+
+    return result;
+}
 
 // Remap input value within input range to output range
-fn float remap(float value, float inputStart, float inputEnd, float outputStart, float outputEnd) @extname("Remap");
+fn float remap(float value, float inputStart, float inputEnd, float outputStart, float outputEnd) {
+    float result = (value - inputStart)/(inputEnd - inputStart)*(outputEnd - outputStart) + outputStart;
+
+    return result;
+}
 
 // Wrap input value from min to max
-fn float wrap(float value, float min, float max) @extname("Wrap");
+fn float wrap(float value, float min, float max) {
+    float result = value - (max - min)*math::floor((value - min)/(max - min));
+
+    return result;
+}
 
 // Check whether two given floats are almost equal
-fn int floatEquals(float x, float y) @extname("FloatEquals");
+fn bool floatEquals(float x, float y) {
+    bool result = (math::abs(x - y)) <= (EPSILON*math::max(1.0f, math::max(math::abs(x), math::abs(y))));
+
+    return result;
+}
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition - Vector2 math
@@ -90,7 +114,7 @@ fn Vector2 Vector2.subtractValue(Vector2* v1, float sub)
 // Calculate vector length
 fn float Vector2.length(Vector2 v)
 {
-    float result = $$sqrt((v.x*v.x) + (v.y*v.y));
+    float result = math::sqrt((v.x*v.x) + (v.y*v.y));
 
     return result;
 }
@@ -114,7 +138,7 @@ fn float Vector2.dotProduct(Vector2 v1, Vector2 v2)
 // Calculate distance between two vectors
 fn float Vector2.distance(Vector2 v1, Vector2 v2)
 {
-    float result = $$sqrt((v1.x - v2.x)*(v1.x - v2.x) + (v1.y - v2.y)*(v1.y - v2.y));
+    float result = math::sqrt((v1.x - v2.x)*(v1.x - v2.x) + (v1.y - v2.y)*(v1.y - v2.y));
 
     return result;
 }
@@ -163,7 +187,7 @@ fn Vector2 Vector2.divide(Vector2* v, Vector2 v2)
 fn Vector2 Vector2.normalize(Vector2* v)
 {
     Vector2 result = {};
-    float length = $$sqrt((v.x*v.x) + (v.y*v.y));
+    float length = math::sqrt((v.x*v.x) + (v.y*v.y));
 
     if (length > 0)
     {
@@ -219,8 +243,8 @@ fn Vector2 Vector2.rotate(Vector2* v, float angle)
 {
     Vector2 result = { };
 
-    float cosres = $$cos(angle);
-    float sinres = $$sin(angle);
+    float cosres = math::cos(angle);
+    float sinres = math::sin(angle);
 
     result.x = v.x*cosres - v.y*sinres;
     result.y = v.x*sinres + v.y*cosres;
@@ -239,7 +263,7 @@ fn Vector2 Vector2.moveTowards(Vector2* v, Vector2 target, float maxDistance)
 
     if ((value == 0) || ((maxDistance >= 0) && (value <= maxDistance*maxDistance))) return target;
 
-    float dist = $$sqrt(value);
+    float dist = math::sqrt(value);
 
     result.x = v.x + dx/dist*maxDistance;
     result.y = v.y + dy/dist*maxDistance;
@@ -262,8 +286,8 @@ fn Vector2 Vector2.clamp(Vector2* v, Vector2 min, Vector2 max)
 {
     Vector2 result = { };
 
-    result.x = $$min(max.x, $$max(min.x, v.x));
-    result.y = $$min(max.y, $$max(min.y, v.y));
+    result.x = math::min(max.x, math::max(min.x, v.x));
+    result.y = math::min(max.y, math::max(min.y, v.y));
 
    return *v = result;
 }
@@ -276,7 +300,7 @@ fn Vector2 Vector2.clampValue(Vector2* v, float min, float max)
     float length = (v.x*v.x) + (v.y*v.y);
     if (length > 0.0f)
     {
-        length = $$sqrt(length);
+        length = math::sqrt(length);
 
         if (length < min)
         {
@@ -298,7 +322,7 @@ fn Vector2 Vector2.clampValue(Vector2* v, float min, float max)
 // Check whether two given vectors are almost equal
 fn bool Vector2.equals(Vector2 p, Vector2 q)
 {
-    bool result = (($$abs(p.x - q.x)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.x), $$abs(q.x))))) && (($$abs(p.y - q.y)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.y), $$abs(q.y)))));
+    bool result = ((math::abs(p.x - q.x)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.x), math::abs(q.x))))) && ((math::abs(p.y - q.y)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.y), math::abs(q.y)))));
 
     return result;
 }
@@ -366,17 +390,17 @@ fn Vector3 Vector3.perpendicular(Vector3* v)
 {
     Vector3 result = { };
 
-    float min = (float) $$abs(v.x);
+    float min = (float) math::abs(v.x);
     Vector3 cardinalAxis = {1.0f, 0.0f, 0.0f};
 
-    if ($$abs(v.y) < min)
+    if (math::abs(v.y) < min)
     {
-        min = (float) $$abs(v.y);
+        min = (float) math::abs(v.y);
         Vector3 tmp = {0.0f, 1.0f, 0.0f};
         cardinalAxis = tmp;
     }
 
-    if ($$abs(v.z) < min)
+    if (math::abs(v.z) < min)
     {
         Vector3 tmp = {0.0f, 0.0f, 1.0f};
         cardinalAxis = tmp;
@@ -393,7 +417,7 @@ fn Vector3 Vector3.perpendicular(Vector3* v)
 // Calculate vector length
 fn float Vector3.length(Vector3 v)
 {
-    float result = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    float result = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
 
     return result;
 }
@@ -422,7 +446,7 @@ fn float Vector3.distance(Vector3 v1, Vector3 v2)
     float dx = v2.x - v1.x;
     float dy = v2.y - v1.y;
     float dz = v2.z - v1.z;
-    result = $$sqrt(dx*dx + dy*dy + dz*dz);
+    result = math::sqrt(dx*dx + dy*dy + dz*dz);
 
     return result;
 }
@@ -446,7 +470,7 @@ fn float Vector3.angle(Vector3 v1, Vector3 v2)
     float result = 0.0f;
 
     Vector3 cross = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x };
-    float len = $$sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z);
+    float len = math::sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z);
     float dot = (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
     result = math::atan2(len, dot);
 
@@ -470,7 +494,7 @@ fn Vector3 Vector3.normalize(Vector3* v)
 {
     Vector3 result = *v;
 
-    float length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    float length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     if (length == 0.0f) length = 1.0f;
     float ilength = 1.0f/length;
 
@@ -491,7 +515,7 @@ fn void Vector3.orthoNormalize(Vector3 *v1, Vector3 *v2)
 
     // Vector3Normalize(*v1);
     Vector3 v = *v1;
-    length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     if (length == 0.0f) length = 1.0f;
     ilength = 1.0f/length;
     v1.x *= ilength;
@@ -503,7 +527,7 @@ Vector3 vn1 = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v
 
     // Vector3Normalize(vn1);
     v = vn1;
-    length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     if (length == 0.0f) length = 1.0f;
     ilength = 1.0f/length;
     vn1.x *= ilength;
@@ -554,7 +578,7 @@ fn Vector3 Vector3.rotateByAxisAngle(Vector3* v, Vector3 axis, float angle)
     Vector3 result = *v;
 
     // Vector3Normalize(axis);
-    float length = $$sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
+    float length = math::sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
     if (length == 0.0f) length = 1.0f;
     float ilength = 1.0f / length;
     axis.x *= ilength;
@@ -562,11 +586,11 @@ fn Vector3 Vector3.rotateByAxisAngle(Vector3* v, Vector3 axis, float angle)
     axis.z *= ilength;
 
     angle /= 2.0f;
-    float a = $$sin(angle);
+    float a = math::sin(angle);
     float b = axis.x * a;
     float c = axis.y * a;
     float d = axis.z * a;
-    a = $$cos(angle);
+    a = math::cos(angle);
     Vector3 w = { b, c, d };
 
     // Vector3CrossProduct(w, v)
@@ -632,9 +656,9 @@ fn Vector3 Vector3.min(Vector3* v1, Vector3 v2)
 {
     Vector3 result = { };
 
-    result.x = $$min(v1.x, v2.x);
-    result.y = $$min(v1.y, v2.y);
-    result.z = $$min(v1.z, v2.z);
+    result.x = math::min(v1.x, v2.x);
+    result.y = math::min(v1.y, v2.y);
+    result.z = math::min(v1.z, v2.z);
 
    return *v1 = result;
 }
@@ -644,9 +668,9 @@ fn Vector3 Vector3.max(Vector3* v1, Vector3 v2)
 {
     Vector3 result = { };
 
-    result.x = $$max(v1.x, v2.x);
-    result.y = $$max(v1.y, v2.y);
-    result.z = $$max(v1.z, v2.z);
+    result.x = math::max(v1.x, v2.x);
+    result.y = math::max(v1.y, v2.y);
+    result.z = math::max(v1.z, v2.z);
 
    return *v1 = result;
 }
@@ -797,9 +821,9 @@ fn Vector3 Vector3.clamp(Vector3* v, Vector3 min, Vector3 max)
 {
     Vector3 result = { };
 
-    result.x = $$min(max.x, $$max(min.x, v.x));
-    result.y = $$min(max.y, $$max(min.y, v.y));
-    result.z = $$min(max.z, $$max(min.z, v.z));
+    result.x = math::min(max.x, math::max(min.x, v.x));
+    result.y = math::min(max.y, math::max(min.y, v.y));
+    result.z = math::min(max.z, math::max(min.z, v.z));
 
    return *v = result;
 }
@@ -812,7 +836,7 @@ fn Vector3 Vector3.clampValue(Vector3* v, float min, float max)
     float length = (v.x*v.x) + (v.y*v.y) + (v.z*v.z);
     if (length > 0.0f)
     {
-        length = $$sqrt(length);
+        length = math::sqrt(length);
 
         if (length < min)
         {
@@ -836,9 +860,9 @@ fn Vector3 Vector3.clampValue(Vector3* v, float min, float max)
 // Check whether two given vectors are almost equal
 fn bool Vector3.equals(Vector3* p, Vector3 q)
 {
-    bool result = (($$abs(p.x - q.x)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.x), $$abs(q.x))))) &&
-                  (($$abs(p.y - q.y)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.y), $$abs(q.y))))) &&
-                  (($$abs(p.z - q.z)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.z), $$abs(q.z)))));
+    bool result = ((math::abs(p.x - q.x)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.x), math::abs(q.x))))) &&
+                  ((math::abs(p.y - q.y)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.y), math::abs(q.y))))) &&
+                  ((math::abs(p.z - q.z)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.z), math::abs(q.z)))));
 
     return result;
 }
@@ -858,7 +882,7 @@ fn Vector3 Vector3.refract(Vector3* v, Vector3 n, float r)
 
     if (d >= 0.0f)
     {
-        d = $$sqrt(d);
+        d = math::sqrt(d);
         v.x = r*v.x - (r*dot + d)*n.x;
         v.y = r*v.y - (r*dot + d)*n.y;
         v.z = r*v.z - (r*dot + d)*n.z;
@@ -1110,14 +1134,14 @@ fn Matrix Matrix.rotate(Matrix* mat, Vector3 axis, float angle)
 
     if ((lengthSquared != 1.0f) && (lengthSquared != 0.0f))
     {
-        float ilength = 1.0f/$$sqrt(lengthSquared);
+        float ilength = 1.0f/math::sqrt(lengthSquared);
         x *= ilength;
         y *= ilength;
         z *= ilength;
     }
 
-    float sinres = $$sin(angle);
-    float cosres = $$cos(angle);
+    float sinres = math::sin(angle);
+    float cosres = math::cos(angle);
     float t = 1.0f - cosres;
 
     result.m0 = x*x*t + cosres;
@@ -1152,8 +1176,8 @@ fn Matrix Matrix.rotateX(Matrix* mat, float angle)
                       0.0f, 0.0f, 1.0f, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f }; // MatrixIdentity()
 
-    float cosres = $$cos(angle);
-    float sinres = $$sin(angle);
+    float cosres = math::cos(angle);
+    float sinres = math::sin(angle);
 
     result.m5 = cosres;
     result.m6 = sinres;
@@ -1172,8 +1196,8 @@ fn Matrix Matrix.rotateY(Matrix* mat, float angle)
                       0.0f, 0.0f, 1.0f, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f }; // MatrixIdentity()
 
-    float cosres = $$cos(angle);
-    float sinres = $$sin(angle);
+    float cosres = math::cos(angle);
+    float sinres = math::sin(angle);
 
     result.m0 = cosres;
     result.m2 = -sinres;
@@ -1192,8 +1216,8 @@ fn Matrix Matrix.rotateZ(Matrix* mat, float angle)
                       0.0f, 0.0f, 1.0f, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f }; // MatrixIdentity()
 
-    float cosres = $$cos(angle);
-    float sinres = $$sin(angle);
+    float cosres = math::cos(angle);
+    float sinres = math::sin(angle);
 
     result.m0 = cosres;
     result.m1 = sinres;
@@ -1213,12 +1237,12 @@ fn Matrix Matrix.rotateXYZ(Matrix* mat, Vector3 angle)
                       0.0f, 0.0f, 1.0f, 0.0f,
                       0.0f, 0.0f, 0.0f, 1.0f }; // MatrixIdentity()
 
-    float cosz = $$cos(-angle.z);
-    float sinz = $$sin(-angle.z);
-    float cosy = $$cos(-angle.y);
-    float siny = $$sin(-angle.y);
-    float cosx = $$cos(-angle.x);
-    float sinx = $$sin(-angle.x);
+    float cosz = math::cos(-angle.z);
+    float sinz = math::sin(-angle.z);
+    float cosy = math::cos(-angle.y);
+    float siny = math::sin(-angle.y);
+    float cosx = math::cos(-angle.x);
+    float sinx = math::sin(-angle.x);
 
     result.m0 = cosz*cosy;
     result.m1 = (cosz*siny*sinx) - (sinz*cosx);
@@ -1241,12 +1265,12 @@ fn Matrix Matrix.rotateZYX(Matrix* mat, Vector3 angle)
 {
     Matrix result = { };
 
-    float cz = $$cos(angle.z);
-    float sz = $$sin(angle.z);
-    float cy = $$cos(angle.y);
-    float sy = $$sin(angle.y);
-    float cx = $$cos(angle.x);
-    float sx = $$sin(angle.x);
+    float cz = math::cos(angle.z);
+    float sz = math::sin(angle.z);
+    float cy = math::cos(angle.y);
+    float sy = math::sin(angle.y);
+    float cx = math::cos(angle.x);
+    float sx = math::sin(angle.x);
 
     result.m0 = cz*cy;
     result.m4 = cz*sy*sx - cx*sz;
@@ -1383,7 +1407,7 @@ fn Matrix Matrix.lookAt(Matrix* mat, Vector3 eye, Vector3 target, Vector3 up)
 
     // Vector3Normalize(vz)
     Vector3 v = vz;
-    length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     if (length == 0.0f) length = 1.0f;
     ilength = 1.0f/length;
     vz.x *= ilength;
@@ -1395,7 +1419,7 @@ fn Matrix Matrix.lookAt(Matrix* mat, Vector3 eye, Vector3 target, Vector3 up)
 
     // Vector3Normalize(x)
     v = vx;
-    length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
     if (length == 0.0f) length = 1.0f;
     ilength = 1.0f/length;
     vx.x *= ilength;
@@ -1487,7 +1511,7 @@ fn Quaternion Quaternion.identity(Quaternion* q)
 // Computes the length of a quaternion
 fn float Quaternion.length(Quaternion q)
 {
-    float result = $$sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+    float result = math::sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
 
     return result;
 }
@@ -1497,7 +1521,7 @@ fn Quaternion Quaternion.normalize(Quaternion* q)
 {
     Quaternion result = {};
 
-    float length = $$sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+    float length = math::sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
     if (length == 0.0f) length = 1.0f;
     float ilength = 1.0f/length;
 
@@ -1596,7 +1620,7 @@ fn Quaternion Quaternion.nLerp(Quaternion* q1, Quaternion q2, float amount)
 
     // QuaternionNormalize(q);
     Quaternion q = result;
-    float length = $$sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+    float length = math::sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
     if (length == 0.0f) length = 1.0f;
     float ilength = 1.0f/length;
 
@@ -1621,7 +1645,7 @@ fn Quaternion Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
         cosHalfTheta = -cosHalfTheta;
     }
 
-    if ($$abs(cosHalfTheta) >= 1.0f) 
+    if (math::abs(cosHalfTheta) >= 1.0f) 
     {
         result = *q1;
     } else if (cosHalfTheta > 0.95f) 
@@ -1630,10 +1654,10 @@ fn Quaternion Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
     }
     else
     {
-        float halfTheta = $$cos(cosHalfTheta);
-        float sinHalfTheta = $$sqrt(1.0f - cosHalfTheta*cosHalfTheta);
+        float halfTheta = math::cos(cosHalfTheta);
+        float sinHalfTheta = math::sqrt(1.0f - cosHalfTheta*cosHalfTheta);
 
-        if ($$abs(sinHalfTheta) < 0.001f)
+        if (math::abs(sinHalfTheta) < 0.001f)
         {
             result.x = (q1.x*0.5f + q2.x*0.5f);
             result.y = (q1.y*0.5f + q2.y*0.5f);
@@ -1642,8 +1666,8 @@ fn Quaternion Quaternion.sLerp(Quaternion* q1, Quaternion q2, float amount)
         }
         else
         {
-            float ratioA = $$sin((1 - amount)*halfTheta)/sinHalfTheta;
-            float ratioB = $$sin(amount*halfTheta)/sinHalfTheta;
+            float ratioA = math::sin((1 - amount)*halfTheta)/sinHalfTheta;
+            float ratioB = math::sin(amount*halfTheta)/sinHalfTheta;
 
             result.x = (q1.x*ratioA + q2.x*ratioB);
             result.y = (q1.y*ratioA + q2.y*ratioB);
@@ -1671,7 +1695,7 @@ fn Quaternion Quaternion.fromVector3ToVector3(Quaternion* q, Vector3 from, Vecto
     // QuaternionNormalize(q);
     // NOTE: Normalize to essentially nlerp the original and identity to 0.5
     Quaternion qr = result;
-    float length = $$sqrt(qr.x*qr.x + qr.y*qr.y + qr.z*qr.z + qr.w*qr.w);
+    float length = math::sqrt(qr.x*qr.x + qr.y*qr.y + qr.z*qr.z + qr.w*qr.w);
     if (length == 0.0f) length = 1.0f;
     float ilength = 1.0f/length;
 
@@ -1713,7 +1737,7 @@ fn Quaternion Quaternion.fromMatrix(Quaternion* q, Matrix mat)
         biggestIndex = 3;
     }
 
-    float biggestVal = $$sqrt(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
+    float biggestVal = math::sqrt(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
     float mult = 0.25f / biggestVal;
 
     switch (biggestIndex)
@@ -1786,7 +1810,7 @@ fn Quaternion Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
 {
     Quaternion result = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-    float axisLength = $$sqrt(axis.x*axis.x + axis.y*axis.y + axis.z*axis.z);
+    float axisLength = math::sqrt(axis.x*axis.x + axis.y*axis.y + axis.z*axis.z);
 
     if (axisLength != 0.0f)
     {
@@ -1797,15 +1821,15 @@ fn Quaternion Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
 
         // Vector3Normalize(axis)
         Vector3 v = axis;
-        length = $$sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+        length = math::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
         if (length == 0.0f) length = 1.0f;
         ilength = 1.0f/length;
         axis.x *= ilength;
         axis.y *= ilength;
         axis.z *= ilength;
 
-        float sinres = $$sin(angle);
-        float cosres = $$cos(angle);
+        float sinres = math::sin(angle);
+        float cosres = math::cos(angle);
 
         result.x = axis.x*sinres;
         result.y = axis.y*sinres;
@@ -1814,7 +1838,7 @@ fn Quaternion Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
 
         // QuaternionNormalize(q);
         Quaternion qr = result;
-        length = $$sqrt(qr.x*qr.x + qr.y*qr.y + qr.z*qr.z + qr.w*qr.w);
+        length = math::sqrt(qr.x*qr.x + qr.y*qr.y + qr.z*qr.z + qr.w*qr.w);
         if (length == 0.0f) length = 1.0f;
         ilength = 1.0f/length;
         result.x = qr.x*ilength;
@@ -1829,10 +1853,10 @@ fn Quaternion Quaternion.fromAxisAngle(Quaternion* q, Vector3 axis, float angle)
 // Get the rotation angle and axis for a given quaternion
 fn void Quaternion.toAxisAngle(Quaternion q, Vector3 *outAxis, float *outAngle)
 {
-    if ($$abs(q.w) > 1.0f)
+    if (math::abs(q.w) > 1.0f)
     {
         // QuaternionNormalize(q);
-        float length = $$sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+        float length = math::sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
         if (length == 0.0f) length = 1.0f;
         float ilength = 1.0f/length;
 
@@ -1843,8 +1867,8 @@ fn void Quaternion.toAxisAngle(Quaternion q, Vector3 *outAxis, float *outAngle)
     }
 
     Vector3 resAxis = { 0.0f, 0.0f, 0.0f };
-    float resAngle = 2.0f*$$cos(q.w);
-    float den = $$sqrt(1.0f - q.w*q.w);
+    float resAngle = 2.0f*math::cos(q.w);
+    float den = math::sqrt(1.0f - q.w*q.w);
 
     if (den > 0.0001f)
     {
@@ -1869,12 +1893,12 @@ fn Quaternion Quaternion.fromEuler(Quaternion* q, float pitch, float yaw, float 
 {
     Quaternion result = { };
 
-    float x0 = $$cos(pitch*0.5f);
-    float x1 = $$sin(pitch*0.5f);
-    float y0 = $$cos(yaw*0.5f);
-    float y1 = $$sin(yaw*0.5f);
-    float z0 = $$cos(roll*0.5f);
-    float z1 = $$sin(roll*0.5f);
+    float x0 = math::cos(pitch*0.5f);
+    float x1 = math::sin(pitch*0.5f);
+    float y0 = math::cos(yaw*0.5f);
+    float y1 = math::sin(yaw*0.5f);
+    float z0 = math::cos(roll*0.5f);
+    float z1 = math::sin(roll*0.5f);
 
     result.x = x1*y0*z0 - x0*y1*z1;
     result.y = x0*y1*z0 + x1*y0*z1;
@@ -1899,7 +1923,7 @@ fn Vector3 Vector3.quaternionToEuler(Vector3* v, Quaternion q)
     float y0 = 2.0f*(q.w*q.y - q.z*q.x);
     y0 = y0 > 1.0f ? 1.0f : y0;
     y0 = y0 < -1.0f ? -1.0f : y0;
-    result.y = $$sin(y0);
+    result.y = math::sin(y0);
 
     // Yaw (z-axis rotation)
     float z0 = 2.0f*(q.w*q.z + q.x*q.y);
@@ -1925,14 +1949,14 @@ fn Quaternion Quaternion.transform(Quaternion* q, Matrix mat)
 // Check whether two given quaternions are almost equal
 fn bool Quaternion.equals(Quaternion p, Quaternion q)
 {
-    bool result = ((($$abs(p.x - q.x)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.x), $$abs(q.x))))) &&
-                  (($$abs(p.y - q.y)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.y), $$abs(q.y))))) &&
-                  (($$abs(p.z - q.z)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.z), $$abs(q.z))))) &&
-                  (($$abs(p.w - q.w)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.w), $$abs(q.w)))))) ||
-                  ((($$abs(p.x + q.x)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.x), $$abs(q.x))))) &&
-                  (($$abs(p.y + q.y)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.y), $$abs(q.y))))) &&
-                  (($$abs(p.z + q.z)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.z), $$abs(q.z))))) &&
-                  (($$abs(p.w + q.w)) <= (EPSILON*$$max(1.0f, $$max($$abs(p.w), $$abs(q.w))))));
+    bool result = (((math::abs(p.x - q.x)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.x), math::abs(q.x))))) &&
+                  ((math::abs(p.y - q.y)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.y), math::abs(q.y))))) &&
+                  ((math::abs(p.z - q.z)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.z), math::abs(q.z))))) &&
+                  ((math::abs(p.w - q.w)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.w), math::abs(q.w)))))) ||
+                  (((math::abs(p.x + q.x)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.x), math::abs(q.x))))) &&
+                  ((math::abs(p.y + q.y)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.y), math::abs(q.y))))) &&
+                  ((math::abs(p.z + q.z)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.z), math::abs(q.z))))) &&
+                  ((math::abs(p.w + q.w)) <= (EPSILON*math::max(1.0f, math::max(math::abs(p.w), math::abs(q.w))))));
 
     return result;
 }
