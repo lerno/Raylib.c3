@@ -25,15 +25,13 @@ fn void main()
 
         // Update
         //----------------------------------------------------------------------------------
-        rl::beginDrawing();
-
+        rl::@drawing() {
             rl::clearBackground(rl::RAYWHITE);
 
             rl::drawText("move the ballwith arrow keys", 10, 10, 20, rl::DARKGRAY);
 
             rl::drawCircleV(ballPosition, 50, rl::MAROON);
-        
-        rl::endDrawing();
+        };
         //----------------------------------------------------------------------------------
 
     }

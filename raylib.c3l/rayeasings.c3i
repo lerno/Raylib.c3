@@ -5,47 +5,47 @@ module rl::easings;
 //----------------------------------------------------------------------------------
 
 // Linear Easing functions
-fn float easeLinearNone(float t, float b, float c, float d) @inline { return (c*t/d + b); }                            // Ease: Linear
-fn float easeLinearIn(float t, float b, float c, float d) @inline { return (c*t/d + b); }                              // Ease: Linear In
-fn float easeLinearOut(float t, float b, float c, float d) @inline { return (c*t/d + b); }                             // Ease: Linear Out
-fn float easeLinearInOut(float t, float b, float c, float d) @inline { return (c*t/d + b); }                           // Ease: Linear In Out
+fn float linearNone(float t, float b, float c, float d) @inline { return (c*t/d + b); }                            // Ease: Linear
+fn float linearIn(float t, float b, float c, float d) @inline { return (c*t/d + b); }                              // Ease: Linear In
+fn float linearOut(float t, float b, float c, float d) @inline { return (c*t/d + b); }                             // Ease: Linear Out
+fn float linearInOut(float t, float b, float c, float d) @inline { return (c*t/d + b); }                           // Ease: Linear In Out
 
 // Sine Easing functions
-fn float easeSineIn(float t, float b, float c, float d) @inline { return (-c*$$cos(t/d*(rl::PI/2.0f)) + c + b); }            // Ease: Sine In
-fn float easeSineOut(float t, float b, float c, float d) @inline { return (c*$$sin(t/d*(rl::PI/2.0f)) + b); }                // Ease: Sine Out
-fn float easeSineInOut(float t, float b, float c, float d) @inline { return (-c/2.0f*($$cos(rl::PI*t/d) - 1.0f) + b); }      // Ease: Sine In Out
+fn float sineIn(float t, float b, float c, float d) @inline { return (-c*$$cos(t/d*(rl::PI/2.0f)) + c + b); }            // Ease: Sine In
+fn float sineOut(float t, float b, float c, float d) @inline { return (c*$$sin(t/d*(rl::PI/2.0f)) + b); }                // Ease: Sine Out
+fn float sineInOut(float t, float b, float c, float d) @inline { return (-c/2.0f*($$cos(rl::PI*t/d) - 1.0f) + b); }      // Ease: Sine In Out
 
 // Circular Easing functions
-fn float easeCircIn(float t, float b, float c, float d) @inline { t /= d; return (-c*($$sqrt(1.0f - t*t) - 1.0f) + b); } // Ease: Circular In
-fn float easeCircOut(float t, float b, float c, float d) @inline { t = t/d - 1.0f; return (c*$$sqrt(1.0f - t*t) + b); }  // Ease: Circular Out
-fn float easeCircInOut(float t, float b, float c, float d) @inline                                                   // Ease: Circular In Out
+fn float circIn(float t, float b, float c, float d) @inline { t /= d; return (-c*($$sqrt(1.0f - t*t) - 1.0f) + b); } // Ease: Circular In
+fn float circOut(float t, float b, float c, float d) @inline { t = t/d - 1.0f; return (c*$$sqrt(1.0f - t*t) + b); }  // Ease: Circular Out
+fn float circInOut(float t, float b, float c, float d) @inline                                                   // Ease: Circular In Out
 {
     if ((t/=d/2.0f) < 1.0f) return (-c/2.0f*($$sqrt(1.0f - t*t) - 1.0f) + b);
     t -= 2.0f; return (c/2.0f*($$sqrt(1.0f - t*t) + 1.0f) + b);
 }
 
 // Cubic Easing functions
-fn float easeCubicIn(float t, float b, float c, float d) @inline { t /= d; return (c*t*t*t + b); }                      // Ease: Cubic In
-fn float easeCubicOut(float t, float b, float c, float d) @inline { t = t/d - 1.0f; return (c*(t*t*t + 1.0f) + b); }    // Ease: Cubic Out
-fn float easeCubicInOut(float t, float b, float c, float d) @inline                                                     // Ease: Cubic In Out
+fn float cubicIn(float t, float b, float c, float d) @inline { t /= d; return (c*t*t*t + b); }                      // Ease: Cubic In
+fn float cubicOut(float t, float b, float c, float d) @inline { t = t/d - 1.0f; return (c*(t*t*t + 1.0f) + b); }    // Ease: Cubic Out
+fn float cubicInOut(float t, float b, float c, float d) @inline                                                     // Ease: Cubic In Out
 {
     if ((t/=d/2.0f) < 1.0f) return (c/2.0f*t*t*t + b);
     t -= 2.0f; return (c/2.0f*(t*t*t + 2.0f) + b);
 }
 
 // Quadratic Easing functions
-fn float easeQuadIn(float t, float b, float c, float d) @inline { t /= d; return (c*t*t + b); }                         // Ease: Quadratic In
-fn float easeQuadOut(float t, float b, float c, float d) @inline { t /= d; return (-c*t*(t - 2.0f) + b); }              // Ease: Quadratic Out
-fn float easeQuadInOut(float t, float b, float c, float d) @inline                                                     // Ease: Quadratic In Out
+fn float quadIn(float t, float b, float c, float d) @inline { t /= d; return (c*t*t + b); }                         // Ease: Quadratic In
+fn float quadOut(float t, float b, float c, float d) @inline { t /= d; return (-c*t*(t - 2.0f) + b); }              // Ease: Quadratic Out
+fn float quadInOut(float t, float b, float c, float d) @inline                                                     // Ease: Quadratic In Out
 {
     if ((t/=d/2) < 1) return (((c/2)*(t*t)) + b);
     return (-c/2.0f*(((t - 1.0f)*(t - 3.0f)) - 1.0f) + b);
 }
 
 // Exponential Easing functions
-fn float easeExpoIn(float t, float b, float c, float d) @inline { return (t == 0.0f) ? b : (c*$$pow(2.0f, 10.0f*(t/d - 1.0f)) + b); }       // Ease: Exponential In
-fn float easeExpoOut(float t, float b, float c, float d) @inline { return (t == d) ? (b + c) : (c*(-$$pow(2.0f, -10.0f*t/d) + 1.0f) + b); } // Ease: Exponential Out
-fn float easeExpoInOut(float t, float b, float c, float d) @inline                                                                        // Ease: Exponential In Out
+fn float expoIn(float t, float b, float c, float d) @inline { return (t == 0.0f) ? b : (c*$$pow(2.0f, 10.0f*(t/d - 1.0f)) + b); }       // Ease: Exponential In
+fn float expoOut(float t, float b, float c, float d) @inline { return (t == d) ? (b + c) : (c*(-$$pow(2.0f, -10.0f*t/d) + 1.0f) + b); } // Ease: Exponential Out
+fn float expoInOut(float t, float b, float c, float d) @inline                                                                        // Ease: Exponential In Out
 {
     if (t == 0.0f) return b;
     if (t == d) return (b + c);
@@ -55,21 +55,21 @@ fn float easeExpoInOut(float t, float b, float c, float d) @inline              
 }
 
 // Back Easing functions
-fn float easeBackIn(float t, float b, float c, float d) @inline // Ease: Back In
+fn float backIn(float t, float b, float c, float d) @inline // Ease: Back In
 {
     float s = 1.70158f;
     float postFix = t/=d;
     return (c*(postFix)*t*((s + 1.0f)*t - s) + b);
 }
 
-fn float easeBackOut(float t, float b, float c, float d) @inline // Ease: Back Out
+fn float backOut(float t, float b, float c, float d) @inline // Ease: Back Out
 {
     float s = 1.70158f;
     t = t/d - 1.0f;
     return (c*(t*t*((s + 1.0f)*t + s) + 1.0f) + b);
 }
 
-fn float easeBackInOut(float t, float b, float c, float d) @inline // Ease: Back In Out
+fn float backInOut(float t, float b, float c, float d) @inline // Ease: Back In Out
 {
     float s = 1.70158f;
     if ((t/=d/2.0f) < 1.0f)
@@ -84,7 +84,7 @@ fn float easeBackInOut(float t, float b, float c, float d) @inline // Ease: Back
 }
 
 // Bounce Easing functions
-fn float easeBounceOut(float t, float b, float c, float d) @inline // Ease: Bounce Out
+fn float bounceOut(float t, float b, float c, float d) @inline // Ease: Bounce Out
 {
     if ((t/=d) < (1.0f/2.75f))
     {
@@ -107,15 +107,15 @@ fn float easeBounceOut(float t, float b, float c, float d) @inline // Ease: Boun
     }
 }
 
-fn float easeBounceIn(float t, float b, float c, float d) @inline { return (c - easeBounceOut(d - t, 0.0f, c, d) + b); } // Ease: Bounce In
-fn float easeBounceInOut(float t, float b, float c, float d) @inline // Ease: Bounce In Out
+fn float bounceIn(float t, float b, float c, float d) @inline { return (c - bounceOut(d - t, 0.0f, c, d) + b); } // Ease: Bounce In
+fn float bounceInOut(float t, float b, float c, float d) @inline // Ease: Bounce In Out
 {
-    if (t < d/2.0f) { return (easeBounceIn(t*2.0f, 0.0f, c, d)*0.5f + b); }
-    else { return (easeBounceOut(t*2.0f - d, 0.0f, c, d)*0.5f + c*0.5f + b); }
+    if (t < d/2.0f) { return (bounceIn(t*2.0f, 0.0f, c, d)*0.5f + b); }
+    else { return (bounceOut(t*2.0f - d, 0.0f, c, d)*0.5f + c*0.5f + b); }
 }
 
 // Elastic Easing functions
-fn float easeElasticIn(float t, float b, float c, float d) @inline // Ease: Elastic In
+fn float elasticIn(float t, float b, float c, float d) @inline // Ease: Elastic In
 {
     if (t == 0.0f) return b;
     if ((t/=d) == 1.0f) return (b + c);
@@ -128,7 +128,7 @@ fn float easeElasticIn(float t, float b, float c, float d) @inline // Ease: Elas
     return (-(postFix*$$sin((t*d-s)*(2.0f*rl::PI)/p )) + b);
 }
 
-fn float easeElasticOut(float t, float b, float c, float d) @inline // Ease: Elastic Out
+fn float elasticOut(float t, float b, float c, float d) @inline // Ease: Elastic Out
 {
     if (t == 0.0f) return b;
     if ((t/=d) == 1.0f) return (b + c);
@@ -140,7 +140,7 @@ fn float easeElasticOut(float t, float b, float c, float d) @inline // Ease: Ela
     return (a*$$pow(2.0f,-10.0f*t)*$$sin((t*d-s)*(2.0f*rl::PI)/p) + c + b);
 }
 
-fn float easeElasticInOut(float t, float b, float c, float d) @inline // Ease: Elastic In Out
+fn float elasticInOut(float t, float b, float c, float d) @inline // Ease: Elastic In Out
 {
     if (t == 0.0f) return b;
     if ((t/=d/2.0f) == 2.0f) return (b + c);

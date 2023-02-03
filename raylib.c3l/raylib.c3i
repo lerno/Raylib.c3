@@ -1722,6 +1722,100 @@ fn void attachAudioStreamProcessor(AudioStream stream, AudioCallback processor) 
 // Detach audio stream processor from stream
 fn void detachAudioStreamProcessor(AudioStream stream, AudioCallback processor) @extname("DetachAudioStreamProcessor");
 
+
+//----------------------------------------------------------------------------------
+// Additional Raylib.c3 Mode helper macros
+//----------------------------------------------------------------------------------
+
+/**
+ * Setup canvas (framebuffer) to start drawing, then calls [block].
+ * Drawing will end after [block] has finished.
+ */
+macro void @drawing(;@body)
+{
+  rl::beginDrawing();
+  defer rl::endDrawing();
+  @body();
+}
+
+/**
+ * Setup 2D mode with custom camera to start 2D Mode, then calls [block].
+ * Mode2D will end after [block] has finished.
+ */
+macro void @mode2D(Camera2D camera, ;@body)
+{
+  rl::beginMode2D(camera);
+  defer rl::endMode2D();
+  @body();
+}
+
+/**
+ * Setup 3D mode with custom camera to start 2D Mode, then calls [block].
+ * Mode2D will end after [block] has finished.
+ */
+macro void @mode3D(Camera3D camera, ;@body)
+{
+  rl::beginMode3D(camera);
+  defer rl::endMode3D();
+  @body();
+}
+
+/**
+ * Setup texture mode to draw to render texture, then calls [block].
+ * texture mode will end after [block] has finished.
+ */
+macro void @textureMode(RenderTexture2D texture, ;@body)
+{
+  rl::beginTextureMode(texture);
+  defer rl::endTextureMode();
+  @body();
+}
+
+
+/**
+ * Setup custom shqder mode then calls [block].
+ * shader mode will end after [block] has finished.
+ */
+macro void @shaderMode(Shader shader, ;@body)
+{
+  rl::beginShaderMode(shader);
+  defer rl::endShaderMode();
+  @body();
+}
+
+/**
+ * Setup blending mode, then calls [block].
+ * blend mode will end after [block] has finished.
+ */
+macro void @blendMode(BlendMode mode, ;@body)
+{
+  rl::beginShaderMode(mode);
+  defer rl::endShaderMode();
+  @body();
+}
+
+/**
+ * Setup scissor mode then calls [block].
+ * scissor mode will end after [block] has finished.
+ */
+macro void @scissorMode(int x, int y, int width, int height, ;@body)
+{
+  rl::beginScissorMode(x, y, width, height);
+  defer rl::endScissorMode();
+  @body();
+}
+
+/**
+ * Setup stereo rendering mode, then calls [block].
+ * stereo rendering mode will end after [block] has finished.
+ */
+macro void @vrMode(VrStereoConfig config ;@body)
+{
+  rl::beginVrStereoMode(config);
+  defer rl::endVrStereoMode();
+  @body();
+}
+
 module rl::config;
 
 //----------------------------------------------------------------------------------
@@ -1887,4 +1981,3 @@ const Gesture SWIPE_UP    = 64;       // Swipe up gesture
 const Gesture SWIPE_DOWN  = 128;      // Swipe down gesture
 const Gesture PINCH_IN    = 256;      // Pinch in gesture
 const Gesture PINCH_OUT   = 512;      // Pinch out gesture
-

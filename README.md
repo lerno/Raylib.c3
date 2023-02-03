@@ -1,53 +1,25 @@
-<a href="http://www.c3-lang.org/"><img style="vertical-align:middle" src=https://i.imgur.com/jtVwIgz.png></a>
-# Raylib C3
+<div align="center">
+<p>
 
-[C3](http://www.c3-lang.org/) binding for [Raylib](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
+<img width="200" src="./assets/logo.png"></img>
 
-*Using Raylib Version 4.5-dev*
+# Raylib.c3 - [Raylib](https://www.raylib.com/) binding for the [C3 Programming Language](https://c3-lang.org/)
 
-## Supported Platforms
-- Windows
-- MacOS
-- Linux
+</p>
 
-## Covered APIs
-- [X] raylib.h
-- [X] raymath.h
-- [X] easings.h
-- [ ] raygui.h 
+| [📀 Installation](./INSTALL.md) | [🧑‍💻 Development](./DEVELOPMENT.md) | [🤝 Contributing](./CONTRIBUTING.md) | [📜 License](./LICENSE) |
 
-## Installation - Using C3s build system
-**1.** Create a C3 project. (instructions without project.c3p below)
+</div>
 
-**2.** Clone the Raylib C3 repository.
-```bash
-https://github.com/Its-Kenta/Raylib-C3.git
-```
+**Raylib.c3** is a [Raylib](https://www.raylib.com/) binding for [Raylib 4.5-dev](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
 
-**3.** Move the *raylib.c3l* folder to your projects *lib*.
+Raylib.c3 is the perfect solution for any Raylib game developer who wants to get the job done without sacrificing their sanity. After all, do you really want to be the one who drained their brain cells just trying fight with C's footguns?
 
-**4.** Add the compiled static library or use your system shared (make sure its added to path!) to the desired target inside the *raylib.c3l* folder. Please make sure it matches the binding version.
+### Code Example
 
-**4.** Edit your *project.json* file to include the library and the library directory as an example:
-```json
-{
-  "langrev": "1",
-  "warnings": [ "no-unused" ],
-  "dependency-search-paths": ["lib"],
-  "dependencies": [ "raylib" ],
-  "authors": [ "YOURNAMEHERE" ],
-  "version": "1.0",
-  "sources": [ "src/**" ],
-  "targets": {
-    "PROJECTNAMEHERE": {
-      "type": "executable"
-    }
-  }
-}
+<details>
+<summary><b>Basic Window</b></summary>
 
-```
-
-**5.** Add the example code to your main.c3 in *src/YOURPROJECTNAME/main.c3*
 ```c
 import rl;
 
@@ -63,47 +35,160 @@ fn void main()
 
     while(!rl::windowShouldClose())
     {
-        rl::beginDrawing();
-        rl::clearBackground(rl::RAYWHITE);
-        rl::drawText("Congrats! You created your first window!", 190, 200, 20, rl::LIGHTGRAY);
-        rl::endDrawing();
+        rl::@drawing() {
+            rl::clearBackground(rl::RAYWHITE);
+            rl::drawText("Congrats! You created your first window!", 190, 200, 20, rl::LIGHTGRAY);
+        };
     }
 }
 ```
 
-**6.** Run `c3c run` command to test it out!
+</details>
 
-**7.** Enjoy your time by learning C3 and create some amazing games!
+<details>
+<summary><b>Basic Keyboard Input</b></summary>
 
-### Running the example without using C3s build system
-Running C3 with external libraries is really easy!
+```c
+import rl;
 
-**1.** Create your source code file with the example above.
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 450;
 
-**2.** Clone the Raylib C3 repository.
-```bash
-https://github.com/Its-Kenta/Raylib-C3.git
+fn void main()
+{
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    rl::setConfigFlags(rl::config::VSYNC_HINT);
+    rl::initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - keyboard input");
+    defer rl::closeWindow();
+
+    Vector2 ballPosition = { (float)(SCREEN_WIDTH/2), (float)(SCREEN_HEIGHT/2) };
+
+    while(!rl::windowShouldClose())
+    {
+        // Update
+        //----------------------------------------------------------------------------------
+        if (rl::isKeyDown(rl::keyboard::RIGHT)) ballPosition.x += 2.0f;
+        if (rl::isKeyDown(rl::keyboard::LEFT)) ballPosition.x -= 2.0f;
+        if (rl::isKeyDown(rl::keyboard::UP)) ballPosition.y -= 2.0f;
+        if (rl::isKeyDown(rl::keyboard::DOWN)) ballPosition.y += 2.0f;
+        //----------------------------------------------------------------------------------
+
+        // Update
+        //----------------------------------------------------------------------------------
+        rl::@drawing() {
+            rl::clearBackground(rl::RAYWHITE);
+
+            rl::drawText("move the ballwith arrow keys", 10, 10, 20, rl::DARKGRAY);
+
+            rl::drawCircleV(ballPosition, 50, rl::MAROON);
+        };
+        //----------------------------------------------------------------------------------
+
+    }
+}
 ```
 
-**3.** Place your the downloaded *raylib.c3l* preferrably in a folder called "lib", but that is up to you. You will just have to pass the path to it later.
+</details>
 
-**4.** Run the following command `c3c compile-run --lib raylib --libdir /path/to/the/dir/with/raylibc3l/ main.c3`
-This command will compile and run the code and pass the library being imported with it's path.
+<details>
+<summary><b>Texture Loading and Drawing</b></summary>
 
+```c
+import rl;
 
-## Contributing
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 450;
 
-1. Fork it (<https://github.com/your-github-user/Raylib-C3/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+fn void main()
+{
+    rl::initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [textures] example - texture loading and drawing");
+    defer rl::closeWindow();
+    
+    rl::setTargetFPS(60);
 
-If you plan to contribute please make sure you follow the same coding convention to match overall style of this binding (camelCases)
+	rl::Texture2D texture = rl::loadTexture("resources/logo.png");
+	defer rl::unloadTexture(texture);
 
-## Contributors
+    while(!rl::windowShouldClose())
+    {
+        rl::@drawing() {
+            rl::clearBackground(rl::RAYWHITE);
+			rl::drawTexture(texture, SCREEN_WIDTH/2 - texture.width/2, SCREEN_HEIGHT/2 - texture.height/2, rl::WHITE);
+            rl::drawText("this IS a texture!", 360, 370, 10, rl::GRAY);
+        };
+    }
+}
+```
 
-- [Kenta](https://github.com/Its-Kenta) - Creator and maintainer
+</details>
 
-## Credits
-Massive thank you to Christoffer L (C3 Creator) for his help on [C3 Discord community server](https://discord.gg/UWUTtUGJBT) and his vendor library template that Raylib-C3 grew from.
+<details>
+<summary><b>3D Free Camera</b></summary>
+
+```c
+import rl;
+
+// Constants
+//--------------------------------------------------------------------------------------
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 450;
+
+//------------------------------------------------------------------------------------
+// Program main entry point
+fn void main() {
+// Initialization
+//--------------------------------------------------------------------------------------
+    rl::initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - 3d camera free");
+    defer rl::closeWindow();
+
+	rl::Camera3D camera = { .position = Vector3{ 10.0f, 10.0f, 10.0f }, .target = Vector3{ 0.0f, 0.0f, 0.0f }, .up = Vector3{ 0.0f, 1.0f, 0.0f }, .fovy = 45.0f, .projection = rl::CameraProjection.PERSPECTIVE }; // named parameters are optional and not required.
+	rl::Vector3 cubePosition = { .x = 0f, .y = 0f, .z = 0f }; // named parameters are optional and not required.
+    
+	rl::setCameraMode(camera, rl::CameraMode.FREE); // Set a free camera mode
+    rl::setTargetFPS(60); // Set our game to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
+
+	// Main game loop
+    while(!rl::windowShouldClose()) { // Detect window close button or ESC key 
+	    
+		// Update
+        //----------------------------------------------------------------------------------
+        rl::updateCamera(&camera);
+
+        if (rl::isKeyDown(rl::keyboard::Z)) camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
+        //----------------------------------------------------------------------------------
+ 		
+		// Draw
+        //----------------------------------------------------------------------------------
+        rl::@drawing() {
+            rl::clearBackground(rl::RAYWHITE);
+
+			rl::@mode3D(camera) {
+				rl::drawCube(cubePosition, 2.0f, 2.0f, 2.0f, rl::RED);
+                rl::drawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, rl::MAROON);
+
+                rl::drawGrid(10, 1.0f);
+			};
+
+			rl::drawRectangle( 10, 10, 320, 133, rl::fade(rl::SKYBLUE, 0.5f));
+            rl::drawRectangleLines( 10, 10, 320, 133, rl::BLUE);
+
+            rl::drawText("Free camera default controls:", 20, 20, 10, rl::BLACK);
+            rl::drawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, rl::DARKGRAY);
+            rl::drawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, rl::DARKGRAY);
+            rl::drawText("- Alt + Mouse Wheel Pressed to Rotate", 40, 80, 10, rl::DARKGRAY);
+            rl::drawText("- Alt + Ctrl + Mouse Wheel Pressed for Smooth Zoom", 40, 100, 10, rl::DARKGRAY);
+            rl::drawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, rl::DARKGRAY);
+        };
+    }
+}
+```
+
+</details>
+
+<p>
+
+More examples can be found [here.](https://github.com/Its-Kenta/Raylib.c3/tree/main/examples)
+
+</p>

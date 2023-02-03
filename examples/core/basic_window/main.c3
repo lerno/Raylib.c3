@@ -12,9 +12,9 @@ fn void main()
 
     while(!rl::windowShouldClose())
     {
-        rl::beginDrawing();
-        rl::clearBackground(rl::RAYWHITE);
-        rl::drawText("Congrats! You created your first window!", 190, 200, 20, rl::LIGHTGRAY);
-        rl::endDrawing();
+        rl::@drawing() {
+            rl::clearBackground(rl::RAYWHITE);
+            rl::drawText("Congrats! You created your first window!", 190, 200, 20, rl::LIGHTGRAY);
+        };
     }
 }

@@ -31,7 +31,7 @@ fn void main()
 
                 // NOTE: Remember that 3rd parameter of easing function refers to
                 // desired value variation, do not confuse it with expected final value!
-                rec.y = rl::easings::easeElasticOut((float)framesCounter, -100, rl::getScreenHeight()/2.0f + 100, 120);
+                rec.y = rl::easings::elasticOut((float)framesCounter, -100, rl::getScreenHeight()/2.0f + 100, 120);
 
                 if (framesCounter >= 120)
                 {
@@ -42,8 +42,8 @@ fn void main()
             case 1:     // Scale box to an horizontal bar
             {
                 framesCounter++;
-                rec.height = rl::easings::easeBounceOut((float)framesCounter, 100, -90, 120);
-                rec.width = rl::easings::easeBounceOut((float)framesCounter, 100, (float)rl::getScreenWidth(), 120);
+                rec.height = rl::easings::bounceOut((float)framesCounter, 100, -90, 120);
+                rec.width = rl::easings::bounceOut((float)framesCounter, 100, (float)rl::getScreenWidth(), 120);
 
                 if (framesCounter >= 120)
                 {
@@ -54,7 +54,7 @@ fn void main()
             case 2:     // Rotate horizontal bar rectangle
             {
                 framesCounter++;
-                rotation = rl::easings::easeQuadOut((float)framesCounter, 0.0f, 270.0f, 240);
+                rotation = rl::easings::quadOut((float)framesCounter, 0.0f, 270.0f, 240);
 
                 if (framesCounter >= 240)
                 {
@@ -65,7 +65,7 @@ fn void main()
             case 3:     // Increase bar size to fill all screen
             {
                 framesCounter++;
-                rec.height = rl::easings::easeCircOut((float)framesCounter, 10, (float)rl::getScreenWidth(), 120);
+                rec.height = rl::easings::circOut((float)framesCounter, 10, (float)rl::getScreenWidth(), 120);
 
                 if (framesCounter >= 120)
                 {
@@ -76,7 +76,7 @@ fn void main()
             case 4:     // Fade out animation
             {
                 framesCounter++;
-                alpha = rl::easings::easeSineOut((float)framesCounter, 1.0f, -1.0f, 160);
+                alpha = rl::easings::sineOut((float)framesCounter, 1.0f, -1.0f, 160);
 
                 if (framesCounter >= 160)
                 {
