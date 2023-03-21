@@ -69,7 +69,7 @@ struct FilePathList {
 }
 
 // Quaternion, 4 components (Vector4 alias)
-define Quaternion = Vector4; 
+typedef Quaternion = Vector4;
 
 // Matrix, 4x4 components, column major, OpenGL style, right handed
 struct Matrix 
@@ -119,10 +119,10 @@ struct Texture
 }
 
 // Texture2D, same as Texture
-define Texture2D = Texture;
+typedef Texture2D = Texture;
 
 // TextureCubemap, same as Texture
-define TextureCubemap = Texture;
+typedef TextureCubemap = Texture;
 
 // RenderTexture, fbo for texture rendering
 struct RenderTexture 
@@ -133,7 +133,7 @@ struct RenderTexture
 }
 
 // RenderTexture2D, same as RenderTexture
-define RenderTexture2D = RenderTexture;
+typedef RenderTexture2D = RenderTexture;
 
 // NPatchInfo, n-patch layout info
 struct NPatchInfo
@@ -177,7 +177,7 @@ struct Camera3D
     int projection;         // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 }
 
-define Camera = Camera3D;    // Camera type fallback, defaults to Camera3D
+typedef Camera = Camera3D;    // Camera type fallback, defaults to Camera3D
 
 // Camera2D, defines position/orientation in 2d space
 struct Camera2D 
@@ -311,7 +311,7 @@ struct Wave
     void* data;                 // Buffer data pointer
 }
 
-define AudioBufferRef = void*;
+typedef AudioBufferRef = void*;
 
 // AudioStream, custom audio stream
 struct AudioStream 
@@ -413,7 +413,7 @@ enum MouseCursor : int
     NOT_ALLOWED    // The operation-not-allowed shape
 }
 
-$assert(MouseCursor.DEFAULT == 0);
+$assert((int)MouseCursor.DEFAULT == 0);
 
 // Gamepad buttons
 enum GamepadButton : int 
@@ -438,7 +438,7 @@ enum GamepadButton : int
     RIGHT_THUMB          // Gamepad joystick pressed button right
 } 
 
-$assert(GamepadButton.UNKNOWN == 0);
+$assert((int)GamepadButton.UNKNOWN == 0);
 
 enum GamepadAxis : int
 {
@@ -450,7 +450,7 @@ enum GamepadAxis : int
     RIGHT_TRIGGER     // Gamepad back trigger right, pressure level: [1..-1]
 }
 
-$assert(GamepadAxis.LEFT_X == 0);
+$assert((int)GamepadAxis.LEFT_X == 0);
 
 // Material map index
 enum MaterialMapIndex : int
@@ -468,7 +468,7 @@ enum MaterialMapIndex : int
     BRDF               // Brdf material
 }
 
-$assert(MaterialMapIndex.ALBEDO == 0);
+$assert((int)MaterialMapIndex.ALBEDO == 0);
 
 // #define MATERIAL_MAP_DIFFUSE      MATERIAL_MAP_ALBEDO
 // #define MATERIAL_MAP_SPECULAR     MATERIAL_MAP_METALNESS
@@ -504,7 +504,7 @@ enum ShaderLocationIndex : int
     MAP_BRDF             // Shader location: sampler2d texture: brdf
 }
 
-$assert(ShaderLocationIndex.VERTEX_POSITION == 0);
+$assert((int)ShaderLocationIndex.VERTEX_POSITION == 0);
 
 //#define SHADER_LOC_MAP_DIFFUSE      SHADER_LOC_MAP_ALBEDO
 //#define SHADER_LOC_MAP_SPECULAR     SHADER_LOC_MAP_METALNESS
@@ -523,7 +523,7 @@ enum ShaderUniformDataType
     SAMPLER2D        // Shader uniform type: sampler2d
 }
 
-$assert(ShaderUniformDataType.FLOAT == 0);
+$assert((int)ShaderUniformDataType.FLOAT == 0);
 
 // Shader attribute data types
 enum ShaderAttributeDataType
@@ -534,7 +534,7 @@ enum ShaderAttributeDataType
     VEC4              // Shader attribute type: vec4 (4 float)
 }
 
-$assert(ShaderAttributeDataType.FLOAT == 0);
+$assert((int)ShaderAttributeDataType.FLOAT == 0);
 
 // Pixel formats
 // NOTE: Support depends on OpenGL version and platform
@@ -564,7 +564,7 @@ enum PixelFormat : int
     COMPRESSED_ASTC_8X8_RGBA    // 2 bpp
 }
 
-$assert(PixelFormat.UNCOMPRESSED_GRAYSCALE == 1);
+$assert((int)PixelFormat.UNCOMPRESSED_GRAYSCALE == 1);
 
 // Texture parameters: filter mode
 // NOTE 1: Filtering considers mipmaps if available in the texture
@@ -579,7 +579,7 @@ enum TextureFilter : int
     ANISOTROPIC_16X,         // Anisotropic filtering 16x
 }
 
-$assert(TextureFilter.POINT == 0);
+$assert((int)TextureFilter.POINT == 0);
 
 // Texture parameters: wrap mode
 enum TextureWrap 
@@ -590,7 +590,7 @@ enum TextureWrap
     MIRROR_CLAMP               // Mirrors and clamps to border the texture in tiled mode
 }
 
-$assert(TextureWrap.REPEAT == 0);
+$assert((int)TextureWrap.REPEAT == 0);
 
 // Cubemap layouts
 enum CubemapLayout
@@ -603,7 +603,7 @@ enum CubemapLayout
     PANORAMA                 // Layout is defined by a panorama image (equirectangular map)
 }
 
-$assert(CubemapLayout.AUTO_DETECT == 0);
+$assert((int)CubemapLayout.AUTO_DETECT == 0);
 
 // Font type, defines generation method
 enum FontType
@@ -613,7 +613,7 @@ enum FontType
     SDF                        // SDF font generation, requires external shader
 }
 
-$assert(FontType.DEFAULT == 0);
+$assert((int)FontType.DEFAULT == 0);
 
 // Color blending modes (pre-defined)
 enum BlendMode : int
@@ -627,7 +627,7 @@ enum BlendMode : int
     CUSTOM                    // Blend textures using custom src/dst factors (use rlSetBlendMode())
 }
 
-$assert(BlendMode.ALPHA == 0);
+$assert((int)BlendMode.ALPHA == 0);
 
 
 // Camera system modes
@@ -640,7 +640,7 @@ enum CameraMode
     THIRD_PERSON             // Third person camera
 }
 
-$assert(CameraMode.CUSTOM == 0);
+$assert((int)CameraMode.CUSTOM == 0);
 
 // Camera projection
 enum CameraProjection
@@ -649,7 +649,7 @@ enum CameraProjection
     ORTHOGRAPHIC             // Orthographic projection
 }
 
-$assert(CameraProjection.PERSPECTIVE == 0);
+$assert((int)CameraProjection.PERSPECTIVE == 0);
 
 // N-patch layout
 enum NPatchLayout 
@@ -659,14 +659,14 @@ enum NPatchLayout
     THREE_PATCH_HORIZONTAL   // Npatch layout: 3x1 tiles
 }
 
-$assert(NPatchLayout.NINE_PATCH == 0);
+$assert((int)NPatchLayout.NINE_PATCH == 0);
 
 // Callbacks to hook some internal functions
 // WARNING: This callbacks are intended for advance users
-define LoadFileDataCallback = fn char* (char* fileName, uint* bytesRead);                     // FileIO: Load binary data
-define SaveFileDataCallback = fn bool(char* fileName, void* data, uint bytesToWrite);         // FileIO: Save binary data
-define LoadFileTextCallback = fn char*(char* fileName);                                       // FileIO: Load text data
-define SaveFileTextCallback = fn bool(char* fileName, char* text);                            // FileIO: Save text data
+typedef LoadFileDataCallback = fn char* (char* fileName, uint* bytesRead);                     // FileIO: Load binary data
+typedef SaveFileDataCallback = fn bool(char* fileName, void* data, uint bytesToWrite);         // FileIO: Save binary data
+typedef LoadFileTextCallback = fn char*(char* fileName);                                       // FileIO: Load text data
+typedef SaveFileTextCallback = fn bool(char* fileName, char* text);                            // FileIO: Save text data
                                                                                               
 // Window-related functions                                                                   
 fn void initWindow(int width, int height, char* title) @extern("InitWindow");              // Initialize window and OpenGL context
@@ -1589,7 +1589,7 @@ fn RayCollision getRayCollisionQuad(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3,
 // Audio Loading and Playing Functions (Module: audio)
 //------------------------------------------------------------------------------------
 
-define AudioCallback = fn void(void* bufferdata, uint frames);
+typedef AudioCallback = fn void(void* bufferdata, uint frames);
 
 // Audio device management functions
 // Initialize audio device and context
@@ -1825,7 +1825,7 @@ module rl::config;
 // NOTE: Every bit registers one state (use it with bit masks)
 // By default all flags are set to 0
 
-define ConfigFlag = distinct uint;
+typedef ConfigFlag = distinct uint;
 
 const ConfigFlag VSYNC_HINT         = 0x00000040;   // Set to try enabling V-Sync on GPU
 const ConfigFlag FULLSCREEN_MODE    = 0x00000002;   // Set to run program in fullscreen
@@ -1848,7 +1848,7 @@ module rl::keyboard;
 // NOTE: Use GetKeyPressed() to allow redefining
 // required keys for alternative layouts
 
-define KeyboardKey = distinct int;
+typedef KeyboardKey = distinct int;
 
 const KeyboardKey NULL            = 0;        // Key: NULL; used for no key pressed
 // Alphanumeric keys
@@ -1967,7 +1967,7 @@ const KeyboardKey VOLUME_DOWN     = 25;       // Key: Android volume down button
 
 module rl::gesture;
 
-define Gesture = distinct int;
+typedef Gesture = distinct int;
 // Gesture
 // NOTE: It could be used as flags to enable only some gestures
 const Gesture NONE        = 0;      // No gesture
